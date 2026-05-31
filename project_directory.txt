@@ -1,0 +1,32 @@
+cradlepoint_gpio_monitor/
+├── src/
+│   ├── config.py
+│   ├── main.py
+│   ├── clients/
+│   │   ├── netcloud_client.py
+│   │   └── ncos_client.py
+│   ├── services/
+│   │   ├── group_service.py
+│   │   ├── router_service.py
+│   │   ├── wan_service.py
+│   │   ├── gpio_service.py
+│   │   └── poll_service.py
+│   ├── repositories/
+│   │   ├── db.py
+│   │   ├── group_repository.py
+│   │   ├── router_repository.py
+│   │   ├── wan_repository.py
+│   │   └── gpio_repository.py
+│   ├── web/
+│   │   ├── app.py
+│   │   ├── routes.py
+│   │   ├── templates/
+│   │   └── static/
+│   └── utils/
+│       ├── gpio_mapper.py
+│       └── logger.py
+├── config/
+│   └── gpio_profiles.json
+├── logs/
+├── .env
+└── requirements.txt
