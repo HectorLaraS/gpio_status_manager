@@ -3,13 +3,20 @@ import json
 from typing import Any
 
 
+def normalize_text(value: str | None) -> str:
+    if not value:
+        return ""
+
+    return " ".join(value.strip().lower().split())
+
+
 def normalize_pin_entry(config_pin: str, gpio_data: dict[str, Any]) -> dict[str, Any]:
     return {
-        "config_pin": str(config_pin),
-        "gpio_name": gpio_data.get("gpio_name") or "",
-        "direction": gpio_data.get("direction") or "in",
-        "high_state_name": gpio_data.get("high_state_name") or "",
-        "low_state_name": gpio_data.get("low_state_name") or "",
+        "config_pin": str(config_pin).strip(),
+        "gpio_name": normalize_text(gpio_data.get("gpio_name")),
+        "direction": normalize_text(gpio_data.get("direction") or "in"),
+        "high_state_name": normalize_text(gpio_data.get("high_state_name")),
+        "low_state_name": normalize_text(gpio_data.get("low_state_name")),
     }
 
 
