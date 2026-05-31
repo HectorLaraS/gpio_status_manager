@@ -83,6 +83,24 @@ def upsert_profile_candidate(
 
         return row[0]
 
+def get_approved_profile_name_by_signature(signature_hash: str) -> str | None:
+    query = """
+        SELECT approved_profile_name
+        FROM dbo.gpio_profile_candidates
+        WHERE signature_hash = ?
+          AND is_reviewed = 1
+          AND approved_profile_name IS NOT NULL;
+    """
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query, signature_hash)
+        row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return row.approved_profile_name
 
 def link_candidate_router(candidate_id: int, router_id: int) -> None:
     query = """

@@ -12,6 +12,12 @@ from src.utils.gpio_signature import (
     build_suggested_profile_name,
 )
 
+from src.repositories.gpio_profile_repository import (
+    get_approved_profile_name_by_signature,
+    link_candidate_router,
+    upsert_profile_candidate,
+)
+
 
 def extract_gpio_pins_from_configuration(configuration_manager: dict[str, Any]) -> dict[str, Any]:
     """
@@ -68,6 +74,7 @@ def sync_gpio_definitions_for_router(
 
     if pins:
         signature_hash, pins_json = build_gpio_signature(pins)
+        approved_profile_name = get_approved_profile_name_by_signature(signature_hash)
         suggested_profile_name = build_suggested_profile_name(
             product_name=product_name,
             signature_hash=signature_hash,
@@ -98,10 +105,12 @@ def sync_gpio_definitions_for_router(
         if not gpio_data.get("enabled", False):
             continue
 
-        status_key, profile_name = get_status_key_for_pin(
+        status_key, auto_profile_name = get_status_key_for_pin(
             product_name=product_name,
             config_pin=str(config_pin),
         )
+
+        profile_name = approved_profile_name or auto_profile_name
 
         upsert_gpio_definition(
             router_db_id=router_db_id,
