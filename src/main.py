@@ -6,6 +6,7 @@ from src.repositories.group_repository import (
     get_active_groups,
 )
 from src.services.router_service import preview_routers_by_active_groups
+from src.services.router_service import sync_routers_by_active_groups
 
 
 def test_database_connection() -> None:
@@ -50,7 +51,8 @@ def main() -> None:
     test_groups_repository()
     print("=" * 40)
 
-    preview_routers_by_active_groups()
+    #preview_routers_by_active_groups()
+    sync_routers_by_active_groups()
 
 
 if __name__ == "__main__":
