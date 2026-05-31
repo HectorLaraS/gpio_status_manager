@@ -1,6 +1,7 @@
 from src.clients.netcloud_client import NetCloudClient
 from src.repositories.group_repository import get_active_groups
 from src.repositories.router_repository import upsert_router, count_routers
+from src.services.wan_service import sync_wan_interfaces_for_router
 
 def sync_routers_by_active_groups() -> None:
     client = NetCloudClient()
@@ -23,6 +24,10 @@ def sync_routers_by_active_groups() -> None:
 
         for router in routers:
             router_db_id = upsert_router(router, group_db_id)
+            wan_ip = sync_wan_interfaces_for_router(
+                router_db_id=router_db_id,
+                router_netcloud_id=int(router.get("id")),
+                )
             total_routers += 1
 
             print(
@@ -30,8 +35,9 @@ def sync_routers_by_active_groups() -> None:
                 f"netcloud_id={router.get('id')} | "
                 f"name={router.get('name')} | "
                 f"state={router.get('state')} | "
-                f"config={router.get('config_status')}"
-            )
+                f"config={router.get('config_status')} | "
+                f"wan_ip={wan_ip}"
+                )
 
         print("-" * 80)
 

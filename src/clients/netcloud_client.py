@@ -36,6 +36,18 @@ class NetCloudClient:
             )
 
         return response.json()
+    
+    def get_wan_net_devices_by_router(self, router_id: int, limit: int = 100) -> list[dict]:
+        data = self._get(
+            "/api/v2/net_devices/",
+            params={
+                "router": router_id,
+                "mode": "wan",
+                "limit": limit,
+            },
+        )
+
+        return data.get("data", [])
 
     def get_routers_by_group(self, group_id: int, limit: int = 500) -> list[dict]:
         data = self._get(

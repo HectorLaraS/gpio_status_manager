@@ -22,7 +22,8 @@ def upsert_router(router: dict[str, Any], group_db_id: int) -> int:
                 ? AS full_product_name,
                 ? AS mac,
                 ? AS serial_number,
-                ? AS asset_id
+                ? AS asset_id, 
+                ? AS resource_uri
         ) AS source
         ON target.netcloud_id = source.netcloud_id
 
@@ -39,7 +40,8 @@ def upsert_router(router: dict[str, Any], group_db_id: int) -> int:
                 target.asset_id = source.asset_id,
                 target.is_active = 1,
                 target.last_seen_at = SYSUTCDATETIME(),
-                target.updated_at = SYSUTCDATETIME()
+                target.updated_at = SYSUTCDATETIME(),
+                target.resource_uri = source.resource_uri
 
         WHEN NOT MATCHED THEN
             INSERT (
@@ -56,7 +58,8 @@ def upsert_router(router: dict[str, Any], group_db_id: int) -> int:
                 is_active,
                 last_seen_at,
                 created_at,
-                updated_at
+                updated_at,
+                resource_uri
             )
             VALUES (
                 source.netcloud_id,
@@ -72,7 +75,8 @@ def upsert_router(router: dict[str, Any], group_db_id: int) -> int:
                 1,
                 SYSUTCDATETIME(),
                 SYSUTCDATETIME(),
-                SYSUTCDATETIME()
+                SYSUTCDATETIME(),
+                source.resource_uri
             )
 
         OUTPUT inserted.id;
@@ -89,6 +93,7 @@ def upsert_router(router: dict[str, Any], group_db_id: int) -> int:
         router.get("mac"),
         router.get("serial_number"),
         router.get("asset_id"),
+        router.get("resource_uri"),
     )
 
     with get_connection() as conn:
