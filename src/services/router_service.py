@@ -12,6 +12,8 @@ def sync_routers_by_active_groups() -> None:
     print("=" * 80)
 
     total_routers = 0
+    total_gpio_defs = 0
+    routers_without_gpio_defs = 0
 
     for group in groups:
         group_db_id = group["id"]
@@ -20,7 +22,17 @@ def sync_routers_by_active_groups() -> None:
 
         print(f"Grupo: {group_name} ({group_netcloud_id})")
 
-        routers = client.get_routers_by_group(group_netcloud_id)
+        try:
+            routers = client.get_routers_by_group(group_netcloud_id)
+        except RuntimeError as error:
+            print(
+                f"WARNING | routers_by_group failed | "
+                f"group_netcloud_id={group_netcloud_id} | "
+                f"group_name={group_name} | "
+                f"error={error}"
+            )
+            continue
+
         print(f"Routers encontrados: {len(routers)}")
 
         for router in routers:
@@ -34,10 +46,18 @@ def sync_routers_by_active_groups() -> None:
                 router_db_id=router_db_id,
                 router_netcloud_id=int(router.get("id")),
                 product_name=router.get("full_product_name"),
-                )
+                router_name=router.get("name"),
+                group_db_id=group_db_id,
+                group_name=group_name,
+            )
+            
+            total_gpio_defs += gpio_count
+
+            if gpio_count == 0:
+                routers_without_gpio_defs += 1
 
 
-            total_routers += 1
+            total_routers += 1  
 
             print(
                 f"  Guardado router_db_id={router_db_id} | "
@@ -48,6 +68,9 @@ def sync_routers_by_active_groups() -> None:
                 f"wan_ip={wan_ip} | "
                 f"gpio_defs={gpio_count}"
             )
+
+            print(f"Total GPIO definitions detectadas: {total_gpio_defs}")
+            print(f"Routers sin GPIO definitions o con error: {routers_without_gpio_defs}")
 
         print("-" * 80)
 

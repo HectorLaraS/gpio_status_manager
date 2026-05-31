@@ -21,22 +21,29 @@ class NetCloudClient:
     def _get(self, endpoint: str, params: dict | None = None) -> dict:
         url = f"{self.base_url}{endpoint}"
 
-        response = requests.get(
-            url,
-            headers=self.headers,
-            params=params,
-            timeout=self.timeout,
-        )
+        try:
+            response = requests.get(
+                url,
+                headers=self.headers,
+                params=params,
+                timeout=self.timeout,
+            )
+        except requests.exceptions.Timeout as error:
+            raise RuntimeError(f"NetCloud timeout: {url}") from error
+        except requests.exceptions.RequestException as error:
+            raise RuntimeError(f"NetCloud request error: {url} | {error}") from error
 
         if response.status_code != 200:
+            response_preview = response.text[:500]
+
             raise RuntimeError(
                 f"NetCloud GET failed: {url} | "
                 f"Status: {response.status_code} | "
-                f"Response: {response.text}"
+                f"Response: {response_preview}"
             )
 
         return response.json()
-    
+        
     def get_configuration_manager_by_router(self, router_id: int) -> dict:
         data = self._get(
             f"/api/v2/routers/{router_id}/configuration_manager/"

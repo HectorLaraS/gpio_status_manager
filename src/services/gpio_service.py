@@ -3,6 +3,14 @@ from typing import Any
 from src.clients.netcloud_client import NetCloudClient
 from src.repositories.gpio_repository import upsert_gpio_definition
 from src.utils.gpio_mapper import get_status_key_for_pin
+from src.repositories.gpio_profile_repository import (
+    link_candidate_router,
+    upsert_profile_candidate,
+)
+from src.utils.gpio_signature import (
+    build_gpio_signature,
+    build_suggested_profile_name,
+)
 
 
 def extract_gpio_pins_from_configuration(configuration_manager: dict[str, Any]) -> dict[str, Any]:
@@ -41,11 +49,45 @@ def sync_gpio_definitions_for_router(
     router_db_id: int,
     router_netcloud_id: int,
     product_name: str | None,
+    router_name: str | None = None,
+    group_db_id: int | None = None,
+    group_name: str | None = None,
 ) -> int:
     client = NetCloudClient()
 
-    config_manager = client.get_configuration_manager_by_router(router_netcloud_id)
+    try:
+        config_manager = client.get_configuration_manager_by_router(router_netcloud_id)
+    except RuntimeError as error:
+        print(
+            f"  WARNING | configuration_manager failed | "
+            f"router_netcloud_id={router_netcloud_id} | error={error}"
+        )
+        return 0
+
     pins = extract_gpio_pins_from_configuration(config_manager)
+
+    if pins:
+        signature_hash, pins_json = build_gpio_signature(pins)
+        suggested_profile_name = build_suggested_profile_name(
+            product_name=product_name,
+            signature_hash=signature_hash,
+        )
+
+        candidate_id = upsert_profile_candidate(
+            signature_hash=signature_hash,
+            suggested_profile_name=suggested_profile_name,
+            product_name=product_name,
+            sample_router_id=router_db_id,
+            sample_router_name=router_name,
+            sample_group_id=group_db_id,
+            sample_group_name=group_name,
+            pins_json=pins_json,
+        )
+
+        link_candidate_router(
+            candidate_id=candidate_id,
+            router_id=router_db_id,
+        )
 
     total = 0
 

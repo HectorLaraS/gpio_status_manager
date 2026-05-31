@@ -26,7 +26,17 @@ def select_primary_wan(net_devices: list[dict[str, Any]]) -> dict[str, Any] | No
 def sync_wan_interfaces_for_router(router_db_id: int, router_netcloud_id: int) -> str | None:
     client = NetCloudClient()
 
-    net_devices = client.get_wan_net_devices_by_router(router_netcloud_id)
+    try:
+        net_devices = client.get_wan_net_devices_by_router(router_netcloud_id)
+    except RuntimeError as error:
+        print(
+            f"  WARNING | net_devices failed | "
+            f"router_netcloud_id={router_netcloud_id} | error={error}"
+        )
+        return None
+
+
+
     primary_wan = select_primary_wan(net_devices)
 
     clear_selected_wan(router_db_id)
