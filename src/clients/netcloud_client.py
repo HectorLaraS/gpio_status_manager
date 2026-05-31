@@ -37,6 +37,13 @@ class NetCloudClient:
 
         return response.json()
     
+    def get_configuration_manager_by_router(self, router_id: int) -> dict:
+        data = self._get(
+            f"/api/v2/routers/{router_id}/configuration_manager/"
+        )
+
+        return data
+    
     def get_wan_net_devices_by_router(self, router_id: int, limit: int = 100) -> list[dict]:
         data = self._get(
             "/api/v2/net_devices/",

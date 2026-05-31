@@ -2,6 +2,7 @@ from src.clients.netcloud_client import NetCloudClient
 from src.repositories.group_repository import get_active_groups
 from src.repositories.router_repository import upsert_router, count_routers
 from src.services.wan_service import sync_wan_interfaces_for_router
+from src.services.gpio_service import sync_gpio_definitions_for_router
 
 def sync_routers_by_active_groups() -> None:
     client = NetCloudClient()
@@ -28,6 +29,14 @@ def sync_routers_by_active_groups() -> None:
                 router_db_id=router_db_id,
                 router_netcloud_id=int(router.get("id")),
                 )
+            
+            gpio_count = sync_gpio_definitions_for_router(
+                router_db_id=router_db_id,
+                router_netcloud_id=int(router.get("id")),
+                product_name=router.get("full_product_name"),
+                )
+
+
             total_routers += 1
 
             print(
@@ -36,8 +45,9 @@ def sync_routers_by_active_groups() -> None:
                 f"name={router.get('name')} | "
                 f"state={router.get('state')} | "
                 f"config={router.get('config_status')} | "
-                f"wan_ip={wan_ip}"
-                )
+                f"wan_ip={wan_ip} | "
+                f"gpio_defs={gpio_count}"
+            )
 
         print("-" * 80)
 
