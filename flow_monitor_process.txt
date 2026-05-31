@@ -1,0 +1,11 @@
+1. Leer groups activos desde DB
+2. Consultar routers por group en NetCloud
+3. Guardar metadata del router
+4. Consultar net_devices WAN por router
+5. Seleccionar WAN conectada y guardar ipv4_address
+6. Consultar configuration_manager
+7. Guardar definición GPIO
+8. Consultar NCOS https://{wan_ip}/api/status
+9. Normalizar GPIO usando gpio_profiles.json
+10. Guardar estado actual
+11. Mostrar en dashboard web
