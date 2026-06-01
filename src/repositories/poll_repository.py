@@ -1,14 +1,16 @@
 from src.repositories.db import get_connection
 
 
-def start_poll_execution() -> str:
+def start_poll_execution(execution_type: str = "GENERAL") -> str:
     query = """
         INSERT INTO dbo.poll_executions (
+            execution_type,
             status,
             started_at
         )
         OUTPUT inserted.execution_id
         VALUES (
+            ?,
             'running',
             SYSUTCDATETIME()
         );
@@ -16,7 +18,7 @@ def start_poll_execution() -> str:
 
     with get_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute(query)
+        cursor.execute(query, execution_type)
         row = cursor.fetchone()
         conn.commit()
 
@@ -60,7 +62,20 @@ def finish_poll_execution(
         cursor.execute(query, params)
         conn.commit()
 
-def has_running_poll() -> bool:
+def has_running_poll(execution_type: str | None = None) -> bool:
+    if execution_type:
+        query = """
+            SELECT COUNT(*)
+            FROM dbo.poll_executions
+            WHERE status = 'running'
+              AND execution_type = ?;
+        """
+
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, execution_type)
+            return cursor.fetchone()[0] > 0
+
     query = """
         SELECT COUNT(*)
         FROM dbo.poll_executions

@@ -1,12 +1,8 @@
-from src.services.status_poll_service import run_status_poll
+from src.services.poll_execution_service import run_status_poll_execution
 
 
 def main() -> None:
-    stats = run_status_poll()
-
-    print("STATUS POLL RESULT")
-    print("=" * 80)
-    print(stats)
+    run_status_poll_execution()
 
 
 if __name__ == "__main__":
