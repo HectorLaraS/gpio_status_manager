@@ -60,6 +60,17 @@ def finish_poll_execution(
         cursor.execute(query, params)
         conn.commit()
 
+def has_running_poll() -> bool:
+    query = """
+        SELECT COUNT(*)
+        FROM dbo.poll_executions
+        WHERE status = 'running';
+    """
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        return cursor.fetchone()[0] > 0
 
 def add_poll_log(
     execution_id: str,

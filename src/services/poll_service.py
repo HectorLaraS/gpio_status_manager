@@ -4,9 +4,13 @@ from src.repositories.poll_repository import (
     start_poll_execution,
 )
 from src.services.router_service import sync_routers_by_active_groups
+from src.repositories.poll_repository import has_running_poll
 
 
 def run_poll() -> None:
+    if has_running_poll():
+        print("POLL SKIPPED | Ya existe una ejecución en status running.")
+        return
     execution_id = start_poll_execution()
 
     print("=" * 80)
