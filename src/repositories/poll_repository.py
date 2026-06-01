@@ -9,17 +9,17 @@ def start_poll_execution(execution_type: str = "GENERAL") -> str:
             started_at
         )
         OUTPUT inserted.execution_id
-        VALUES (
-            ?,
-            'running',
-            SYSUTCDATETIME()
-        );
+        VALUES (?, 'running', SYSUTCDATETIME());
     """
 
     with get_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute(query, execution_type)
+        cursor.execute(query, (execution_type,))
         row = cursor.fetchone()
+
+        if row is None:
+            raise RuntimeError("No execution_id returned from poll_executions insert.")
+
         conn.commit()
 
         return str(row[0])
