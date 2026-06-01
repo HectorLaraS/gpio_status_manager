@@ -3,7 +3,7 @@ from src.repositories.poll_repository import (
     finish_poll_execution,
     start_poll_execution,
 )
-from src.services.router_service import sync_routers_by_active_groups
+from src.services.inventory_poll_service import run_inventory_poll
 from src.repositories.poll_repository import has_running_poll
 
 
@@ -25,7 +25,7 @@ def run_poll() -> None:
             message="Poll execution started.",
         )
 
-        stats = sync_routers_by_active_groups()
+        stats = run_inventory_poll()
 
         add_poll_log(
             execution_id=execution_id,
