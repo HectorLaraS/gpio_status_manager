@@ -7,6 +7,7 @@ from src.repositories.group_repository import (
 )
 from src.services.router_service import preview_routers_by_active_groups
 from src.services.router_service import sync_routers_by_active_groups
+from src.clients.ncos_client import NcosClient
 
 
 def test_database_connection() -> None:
