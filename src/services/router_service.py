@@ -5,16 +5,22 @@ from src.services.wan_service import sync_wan_interfaces_for_router
 from src.services.gpio_service import sync_gpio_definitions_for_router
 from src.services.gpio_status_service import sync_gpio_status_for_router
 
-def sync_routers_by_active_groups() -> None:
+
+def sync_routers_by_active_groups() -> dict:
+    stats = {
+        "groups_processed": 0,
+        "routers_processed": 0,
+        "routers_success": 0,
+        "routers_failed": 0,
+        "gpio_definitions": 0,
+        "gpio_status": 0,
+    }
+
     client = NetCloudClient()
     groups = get_active_groups()
 
     print(f"Sincronizando routers de {len(groups)} grupos activos...")
     print("=" * 80)
-
-    total_routers = 0
-    total_gpio_defs = 0
-    routers_without_gpio_defs = 0
 
     for group in groups:
         group_db_id = group["id"]
@@ -25,6 +31,7 @@ def sync_routers_by_active_groups() -> None:
 
         try:
             routers = client.get_routers_by_group(group_netcloud_id)
+            stats["groups_processed"] += 1
         except RuntimeError as error:
             print(
                 f"WARNING | routers_by_group failed | "
@@ -37,55 +44,68 @@ def sync_routers_by_active_groups() -> None:
         print(f"Routers encontrados: {len(routers)}")
 
         for router in routers:
-            router_db_id = upsert_router(router, group_db_id)
-            wan_ip = sync_wan_interfaces_for_router(
-                router_db_id=router_db_id,
-                router_netcloud_id=int(router.get("id")),
-                )
-            
-            gpio_status_count = 0
+            stats["routers_processed"] += 1
 
-            if wan_ip:
-                gpio_status_count = sync_gpio_status_for_router(
+            try:
+                router_db_id = upsert_router(router, group_db_id)
+
+                wan_ip = sync_wan_interfaces_for_router(
                     router_db_id=router_db_id,
-                    wan_ip=wan_ip,
+                    router_netcloud_id=int(router.get("id")),
                 )
 
-            gpio_count = sync_gpio_definitions_for_router(
-                router_db_id=router_db_id,
-                router_netcloud_id=int(router.get("id")),
-                product_name=router.get("full_product_name"),
-                router_name=router.get("name"),
-                group_db_id=group_db_id,
-                group_name=group_name,
-            )
-            
-            total_gpio_defs += gpio_count
+                gpio_count = sync_gpio_definitions_for_router(
+                    router_db_id=router_db_id,
+                    router_netcloud_id=int(router.get("id")),
+                    product_name=router.get("full_product_name"),
+                    router_name=router.get("name"),
+                    group_db_id=group_db_id,
+                    group_name=group_name,
+                )
 
-            if gpio_count == 0:
-                routers_without_gpio_defs += 1
+                stats["gpio_definitions"] += gpio_count
 
+                gpio_status_count = 0
 
-            total_routers += 1  
+                if wan_ip:
+                    gpio_status_count = sync_gpio_status_for_router(
+                        router_db_id=router_db_id,
+                        wan_ip=wan_ip,
+                    )
 
-            print(
-                f"  Guardado router_db_id={router_db_id} | "
-                f"netcloud_id={router.get('id')} | "
-                f"name={router.get('name')} | "
-                f"state={router.get('state')} | "
-                f"config={router.get('config_status')} | "
-                f"wan_ip={wan_ip} | "
-                f"gpio_defs={gpio_count} | "
-                f"gpio_status={gpio_status_count}"
-            )
+                stats["gpio_status"] += gpio_status_count
+                stats["routers_success"] += 1
 
-            print(f"Total GPIO definitions detectadas: {total_gpio_defs}")
-            print(f"Routers sin GPIO definitions o con error: {routers_without_gpio_defs}")
+                print(
+                    f"  Guardado router_db_id={router_db_id} | "
+                    f"netcloud_id={router.get('id')} | "
+                    f"name={router.get('name')} | "
+                    f"state={router.get('state')} | "
+                    f"config={router.get('config_status')} | "
+                    f"wan_ip={wan_ip} | "
+                    f"gpio_defs={gpio_count} | "
+                    f"gpio_status={gpio_status_count}"
+                )
+
+            except Exception as error:
+                stats["routers_failed"] += 1
+                print(
+                    f"  ERROR | router_netcloud_id={router.get('id')} | "
+                    f"name={router.get('name')} | error={error}"
+                )
+                continue
 
         print("-" * 80)
 
-    print(f"Routers procesados en esta ejecución: {total_routers}")
+    print(f"Routers procesados en esta ejecución: {stats['routers_processed']}")
+    print(f"Routers exitosos: {stats['routers_success']}")
+    print(f"Routers fallidos: {stats['routers_failed']}")
+    print(f"GPIO definitions detectadas: {stats['gpio_definitions']}")
+    print(f"GPIO status actualizados: {stats['gpio_status']}")
     print(f"Routers totales en DB: {count_routers()}")
+
+    return stats
+
 
 def preview_routers_by_active_groups() -> None:
     client = NetCloudClient()
