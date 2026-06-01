@@ -3,6 +3,7 @@ from src.repositories.group_repository import get_active_groups
 from src.repositories.router_repository import upsert_router, count_routers
 from src.services.wan_service import sync_wan_interfaces_for_router
 from src.services.gpio_service import sync_gpio_definitions_for_router
+from src.services.gpio_status_service import sync_gpio_status_for_router
 
 def sync_routers_by_active_groups() -> None:
     client = NetCloudClient()
@@ -42,6 +43,14 @@ def sync_routers_by_active_groups() -> None:
                 router_netcloud_id=int(router.get("id")),
                 )
             
+            gpio_status_count = 0
+
+            if wan_ip:
+                gpio_status_count = sync_gpio_status_for_router(
+                    router_db_id=router_db_id,
+                    wan_ip=wan_ip,
+                )
+
             gpio_count = sync_gpio_definitions_for_router(
                 router_db_id=router_db_id,
                 router_netcloud_id=int(router.get("id")),
@@ -66,7 +75,8 @@ def sync_routers_by_active_groups() -> None:
                 f"state={router.get('state')} | "
                 f"config={router.get('config_status')} | "
                 f"wan_ip={wan_ip} | "
-                f"gpio_defs={gpio_count}"
+                f"gpio_defs={gpio_count} | "
+                f"gpio_status={gpio_status_count}"
             )
 
             print(f"Total GPIO definitions detectadas: {total_gpio_defs}")
