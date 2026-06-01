@@ -45,6 +45,17 @@ class NcosClient:
     def get_gpio_status(self, wan_ip: str) -> dict:
         status_data = self.get_status(wan_ip)
 
+        # Caso 1: /api/status responde {"success": true, "data": {"gpio": {...}}}
+        gpio_status = (
+            status_data
+            .get("data", {})
+            .get("gpio", {})
+        )
+
+        if gpio_status:
+            return gpio_status
+
+        # Caso 2: /api/status responde {"success": true, "data": {"status": {"gpio": {...}}}}
         gpio_status = (
             status_data
             .get("data", {})
