@@ -1,7 +1,7 @@
 from typing import Any
 
 from src.repositories.db import get_connection
-
+from typing import Any
 
 def clear_selected_wan(router_db_id: int) -> None:
     query = """
@@ -17,6 +17,45 @@ def clear_selected_wan(router_db_id: int) -> None:
         cursor.execute(query, router_db_id)
         conn.commit()
 
+def get_selected_wan_routers() -> list[dict[str, Any]]:
+    query = """
+        SELECT
+            r.id AS router_id,
+            r.netcloud_id,
+            r.name,
+            r.description,
+            r.state,
+            r.config_status,
+            r.full_product_name,
+            w.ipv4_address
+        FROM dbo.routers r
+        JOIN dbo.router_wan_interfaces w
+            ON r.id = w.router_id
+        WHERE
+            r.is_active = 1
+            AND w.is_selected = 1
+            AND w.ipv4_address IS NOT NULL
+        ORDER BY r.name;
+    """
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+        return [
+            {
+                "router_id": row.router_id,
+                "netcloud_id": row.netcloud_id,
+                "name": row.name,
+                "description": row.description,
+                "state": row.state,
+                "config_status": row.config_status,
+                "full_product_name": row.full_product_name,
+                "ipv4_address": row.ipv4_address,
+            }
+            for row in rows
+        ]
 
 def upsert_wan_interface(
     router_db_id: int,
