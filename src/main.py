@@ -8,7 +8,7 @@ from src.repositories.group_repository import (
 from src.services.router_service import preview_routers_by_active_groups
 from src.services.router_service import sync_routers_by_active_groups
 from src.clients.ncos_client import NcosClient
-
+from src.services.poll_service import run_poll
 
 def test_database_connection() -> None:
     with get_connection() as conn:
@@ -53,8 +53,8 @@ def main() -> None:
     print("=" * 40)
 
     #preview_routers_by_active_groups()
-    sync_routers_by_active_groups()
-
+    #sync_routers_by_active_groups()
+    run_poll()
 
 if __name__ == "__main__":
     main()
