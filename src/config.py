@@ -46,6 +46,7 @@ class DatabaseConfig:
 @dataclass(frozen=True)
 class AppConfig:
     poll_interval_minutes: int
+    status_poll_max_workers: int
     secret_key: str
     log_level: str
     log_path: str
@@ -85,6 +86,7 @@ def load_settings() -> Settings:
         ),
         app=AppConfig(
             poll_interval_minutes=int(os.getenv("POLL_INTERVAL_MINUTES", "5")),
+            status_poll_max_workers=int(os.getenv("STATUS_POLL_MAX_WORKERS", "10")),
             secret_key=os.getenv("APP_SECRET_KEY", "change_me"),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
             log_path=os.getenv("LOG_PATH", "logs/app.log"),
