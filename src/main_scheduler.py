@@ -1,10 +1,12 @@
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from src.config import load_settings
-from src.services.inventory_poll_service import run_inventory_poll
-from src.services.status_poll_service import run_status_poll
 from src.repositories.poll_repository import has_running_poll
+from src.services.poll_execution_service import (
+    run_inventory_poll_execution,
+    run_status_poll_execution,
+)
 
 
 def parse_inventory_hours(value: str) -> set[int]:
@@ -21,11 +23,27 @@ def parse_inventory_hours(value: str) -> set[int]:
     return hours
 
 
-def should_run_inventory_poll(now: datetime, inventory_hours: set[int], last_inventory_key: str | None) -> tuple[bool, str]:
-    current_key = now.strftime("%Y-%m-%d-%H")
+def should_run_status_poll(
+    now: datetime,
+    last_status_run: datetime | None,
+    interval_minutes: int,
+) -> bool:
+    if last_status_run is None:
+        return True
 
+    next_run = last_status_run + timedelta(minutes=interval_minutes)
+    return now >= next_run
+
+
+def should_run_inventory_poll(
+    now: datetime,
+    inventory_hours: set[int],
+    last_inventory_key: str | None,
+) -> tuple[bool, str | None]:
     if now.hour not in inventory_hours:
-        return False, last_inventory_key or ""
+        return False, last_inventory_key
+
+    current_key = now.strftime("%Y-%m-%d-%H")
 
     if last_inventory_key == current_key:
         return False, last_inventory_key
@@ -36,15 +54,11 @@ def should_run_inventory_poll(now: datetime, inventory_hours: set[int], last_inv
 def main() -> None:
     settings = load_settings()
 
-    status_interval_minutes = int(
-        getattr(settings.app, "status_poll_interval_minutes", settings.app.poll_interval_minutes)
-    )
+    status_interval_minutes = settings.app.status_poll_interval_minutes
+    inventory_hours = parse_inventory_hours(settings.app.inventory_poll_hours)
 
-    inventory_hours_value = getattr(settings.app, "inventory_poll_hours", "6,18")
-    inventory_hours = parse_inventory_hours(inventory_hours_value)
-
-    last_status_run = None
-    last_inventory_key = None
+    last_status_run: datetime | None = None
+    last_inventory_key: str | None = None
 
     print("=" * 80)
     print("GPIO STATUS MANAGER SCHEDULER STARTED")
@@ -57,29 +71,30 @@ def main() -> None:
         now = datetime.now()
 
         try:
-            run_inventory, new_inventory_key = should_run_inventory_poll(
+            run_inventory, inventory_key = should_run_inventory_poll(
                 now=now,
                 inventory_hours=inventory_hours,
                 last_inventory_key=last_inventory_key,
             )
 
             if run_inventory:
-                if has_running_poll():
-                    print("INVENTORY POLL SKIPPED | Existing poll running.")
+                if has_running_poll("INVENTORY"):
+                    print("INVENTORY POLL SKIPPED | Existing inventory poll running.")
                 else:
                     print(f"INVENTORY POLL TRIGGERED | {now}")
-                    run_inventory_poll()
-                    last_inventory_key = new_inventory_key
+                    run_inventory_poll_execution()
+                    last_inventory_key = inventory_key
 
-            if (
-                last_status_run is None
-                or (now - last_status_run).total_seconds() >= status_interval_minutes * 60
+            if should_run_status_poll(
+                now=now,
+                last_status_run=last_status_run,
+                interval_minutes=status_interval_minutes,
             ):
-                if has_running_poll():
-                    print("STATUS POLL SKIPPED | Existing poll running.")
+                if has_running_poll("STATUS"):
+                    print("STATUS POLL SKIPPED | Existing status poll running.")
                 else:
                     print(f"STATUS POLL TRIGGERED | {now}")
-                    run_status_poll()
+                    run_status_poll_execution()
                     last_status_run = datetime.now()
 
         except Exception as error:
