@@ -54,6 +54,15 @@ from src.repositories.incident_rule_repository import (
     update_incident_rule,
 )
 
+from src.repositories.auth_repository import (
+    create_user,
+    get_all_users,
+    get_user_by_id,
+    reset_user_password,
+    set_user_active,
+    update_user,
+)
+
 web_bp = Blueprint("web", __name__)
 
 @web_bp.route("/users")
@@ -66,6 +75,85 @@ def users():
         users=users_list,
     )
 
+@web_bp.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
+@roles_required("ADMINISTRATOR")
+def edit_user_route(user_id: int):
+    user = get_user_by_id(user_id)
+
+    if not user:
+        return redirect("/users")
+
+    if request.method == "POST":
+        display_name = request.form["display_name"].strip()
+        role_name = request.form["role_name"]
+
+        update_user(
+            user_id=user_id,
+            display_name=display_name,
+            role_name=role_name,
+        )
+
+        return redirect("/users")
+
+    return render_template(
+        "edit_user.html",
+        user=user,
+    )
+
+
+@web_bp.route("/users/<int:user_id>/disable", methods=["POST"])
+@roles_required("ADMINISTRATOR")
+def disable_user_route(user_id: int):
+    set_user_active(
+        user_id=user_id,
+        is_active=False,
+    )
+
+    return redirect("/users")
+
+
+@web_bp.route("/users/<int:user_id>/enable", methods=["POST"])
+@roles_required("ADMINISTRATOR")
+def enable_user_route(user_id: int):
+    set_user_active(
+        user_id=user_id,
+        is_active=True,
+    )
+
+    return redirect("/users")
+
+
+@web_bp.route("/users/<int:user_id>/reset-password", methods=["GET", "POST"])
+@roles_required("ADMINISTRATOR")
+def reset_password_route(user_id: int):
+    user = get_user_by_id(user_id)
+
+    if not user:
+        return redirect("/users")
+
+    if request.method == "POST":
+        new_password = request.form["new_password"]
+        confirm_password = request.form["confirm_password"]
+
+        if new_password != confirm_password:
+            return render_template(
+                "reset_password.html",
+                user=user,
+                error="Passwords do not match.",
+            )
+
+        reset_user_password(
+            user_id=user_id,
+            new_password=new_password,
+        )
+
+        return redirect("/users")
+
+    return render_template(
+        "reset_password.html",
+        user=user,
+        error=None,
+    )
 
 @web_bp.route("/users/create", methods=["GET", "POST"])
 @roles_required("ADMINISTRATOR")

@@ -23,6 +23,7 @@
             <th>Enabled</th>
             <th>Created</th>
             <th>Last Login</th>
+            <th>Actions</th>
         </tr>
     </thead>
 
@@ -35,6 +36,26 @@
             <td>{{ user.is_active }}</td>
             <td>{{ user.created_at }}</td>
             <td>{{ user.last_login_at }}</td>
+            <td>
+                <a href="/users/{{ user.id }}/edit">Edit</a>
+                |
+                <a href="/users/{{ user.id }}/reset-password">Reset Password</a>
+                |
+
+                {% if user.is_active %}
+                <form method="POST"
+                      action="/users/{{ user.id }}/disable"
+                      style="display:inline;">
+                    <button type="submit">Disable</button>
+                </form>
+                {% else %}
+                <form method="POST"
+                      action="/users/{{ user.id }}/enable"
+                      style="display:inline;">
+                    <button type="submit">Enable</button>
+                </form>
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>
