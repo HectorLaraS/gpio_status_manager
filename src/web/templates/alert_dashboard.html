@@ -50,6 +50,51 @@
 
 </div>
 
+<h2>Poll Health</h2>
+
+<div class="summary-container">
+
+    <div class="card">
+        <h3>Status Poll</h3>
+        {% if last_status_poll %}
+            <p class="small-text">Status: {{ last_status_poll.status }}</p>
+            <p class="small-text">Duration: {{ last_status_poll.duration }}</p>
+            <p class="small-text">Routers: {{ last_status_poll.routers_processed }}</p>
+            <p class="small-text">Failed: {{ last_status_poll.routers_failed }}</p>
+            <p class="small-text">Finished: {{ last_status_poll.finished_at }}</p>
+        {% else %}
+            <p>No data</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Inventory Poll</h3>
+        {% if last_inventory_poll %}
+            <p class="small-text">Status: {{ last_inventory_poll.status }}</p>
+            <p class="small-text">Duration: {{ last_inventory_poll.duration }}</p>
+            <p class="small-text">Routers: {{ last_inventory_poll.routers_processed }}</p>
+            <p class="small-text">Failed: {{ last_inventory_poll.routers_failed }}</p>
+            <p class="small-text">Finished: {{ last_inventory_poll.finished_at }}</p>
+        {% else %}
+            <p>No data</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Alert Engine</h3>
+        {% if last_alert_engine %}
+            <p class="small-text">Status: {{ last_alert_engine.status }}</p>
+            <p class="small-text">Duration: {{ last_alert_engine.duration }}</p>
+            <p class="small-text">Processed: {{ last_alert_engine.routers_processed }}</p>
+            <p class="small-text">Notes: {{ last_alert_engine.notes }}</p>
+            <p class="small-text">Finished: {{ last_alert_engine.finished_at }}</p>
+        {% else %}
+            <p>No data</p>
+        {% endif %}
+    </div>
+
+</div>
+
 <h2>Alerts by Type</h2>
 
 <table>

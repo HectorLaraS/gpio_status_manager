@@ -7,6 +7,7 @@ from src.repositories.alert_dashboard_repository import (
     get_recently_closed_alerts,
     get_recently_opened_alerts,
     get_top_affected_routers,
+    get_last_execution_by_type,
 )
 
 from src.repositories.dashboard_repository import (
@@ -38,6 +39,9 @@ def alert_dashboard():
     recently_opened = get_recently_opened_alerts()
     recently_closed = get_recently_closed_alerts()
     top_routers = get_top_affected_routers()
+    last_status_poll = get_last_execution_by_type("STATUS")
+    last_inventory_poll = get_last_execution_by_type("INVENTORY")
+    last_alert_engine = get_last_execution_by_type("ALERT_ENGINE")
 
     return render_template(
         "alert_dashboard.html",
@@ -46,7 +50,10 @@ def alert_dashboard():
         recently_opened=recently_opened,
         recently_closed=recently_closed,
         top_routers=top_routers,
-    )
+        last_status_poll=last_status_poll,
+        last_inventory_poll=last_inventory_poll,
+        last_alert_engine=last_alert_engine,
+        )
 
 @web_bp.route("/incident-rules")
 def incident_rules():
@@ -81,9 +88,14 @@ def update_incident_rule_route():
     )
 
 @web_bp.route("/")
+def home():
+    return render_template("home.html")
+
+@web_bp.route("/dashboard")
 def dashboard():
     summary = get_dashboard_summary()
     routers = get_dashboard_routers()
+
     last_inventory_poll = get_last_poll_by_type("INVENTORY")
     last_status_poll = get_last_poll_by_type("STATUS")
 

@@ -2,6 +2,60 @@ from typing import Any
 
 from src.repositories.db import get_connection
 
+def get_last_execution_by_type(execution_type: str) -> dict[str, Any] | None:
+    query = """
+        SELECT TOP 1
+            execution_type,
+            status,
+            started_at,
+            finished_at,
+            DATEDIFF(SECOND, started_at, finished_at) AS duration_seconds,
+            routers_processed,
+            routers_success,
+            routers_failed,
+            notes
+        FROM dbo.poll_executions
+        WHERE execution_type = ?
+        ORDER BY started_at DESC;
+    """
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query, execution_type)
+        row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return {
+            "execution_type": row.execution_type,
+            "status": row.status,
+            "started_at": row.started_at,
+            "finished_at": row.finished_at,
+            "duration_seconds": row.duration_seconds,
+            "duration": format_duration(row.duration_seconds),
+            "routers_processed": row.routers_processed,
+            "routers_success": row.routers_success,
+            "routers_failed": row.routers_failed,
+            "notes": row.notes,
+        }
+
+
+def format_duration(seconds: int | None) -> str:
+    if seconds is None:
+        return "N/A"
+
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    remaining_seconds = seconds % 60
+
+    if hours > 0:
+        return f"{hours}h {minutes}m {remaining_seconds}s"
+
+    if minutes > 0:
+        return f"{minutes}m {remaining_seconds}s"
+
+    return f"{remaining_seconds}s"
 
 def get_open_alerts_summary() -> dict[str, Any]:
     query = """
