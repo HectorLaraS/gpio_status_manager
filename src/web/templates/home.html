@@ -11,6 +11,12 @@
 <h1>GPIO Status Manager</h1>
 
 <p class="small-text">
+    Logged in as {{ session.display_name }} |
+    Role: {{ session.role_name }} |
+    <a href="/logout">Logout</a>
+</p>
+
+<p class="small-text">
     Operational portal for Cradlepoint GPIO monitoring, alerting and polling health.
 </p>
 
@@ -31,20 +37,24 @@
         <p>View GPIO alerts, offline routers and config pending/not synced devices.</p>
     </a>
 
+    {% if session.role_name in ["ENGINEER", "ADMINISTRATOR"] %}
     <a class="home-card" href="/incident-rules">
         <h2>Alert Rules</h2>
         <p>Configure duration, priority and enable/disable alert rules.</p>
     </a>
+    {% endif %}
 
     <a class="home-card disabled-card" href="#">
         <h2>Poll Executions</h2>
         <p>Coming soon: review scheduler, inventory, status and alert engine executions.</p>
     </a>
 
+    {% if session.role_name == "ADMINISTRATOR" %}
     <a class="home-card disabled-card" href="#">
         <h2>User Administration</h2>
         <p>Coming soon: create users, assign roles and manage access.</p>
     </a>
+    {% endif %}
 
 </div>
 

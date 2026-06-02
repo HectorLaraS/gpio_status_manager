@@ -17,6 +17,15 @@ from flask import (
     session,
 )
 
+from src.web.auth import login_required, roles_required
+
+from flask import (
+    render_template,
+    request,
+    redirect,
+    session,
+)
+
 from src.services.auth_service import (
     authenticate_user,
 )
@@ -44,6 +53,7 @@ from src.repositories.incident_rule_repository import (
 web_bp = Blueprint("web", __name__)
 
 @web_bp.route("/alert-dashboard")
+@login_required
 def alert_dashboard():
     summary = get_open_alerts_summary()
     alerts_by_type = get_alerts_by_type()
@@ -67,6 +77,7 @@ def alert_dashboard():
         )
 
 @web_bp.route("/incident-rules")
+@roles_required("ENGINEER", "ADMINISTRATOR")
 def incident_rules():
 
     rules = get_incident_rules()
@@ -77,6 +88,7 @@ def incident_rules():
     )
 
 @web_bp.route("/incident-rules/update", methods=["POST"])
+@roles_required("ENGINEER", "ADMINISTRATOR")
 def update_incident_rule_route():
 
     rule_id = int(request.form["rule_id"])
@@ -99,6 +111,7 @@ def update_incident_rule_route():
     )
 
 @web_bp.route("/")
+@login_required
 def home():
     return render_template("home.html")
 
@@ -129,14 +142,21 @@ def login():
         session["display_name"] = user["display_name"]
         session["role_name"] = user["role_name"]
 
-        return redirect("/")
+        next_url = request.args.get("next") or "/"
+        return redirect(next_url)
 
     return render_template(
         "login.html",
         error=None,
     )
 
+@web_bp.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
+
 @web_bp.route("/dashboard")
+@login_required
 def dashboard():
     summary = get_dashboard_summary()
     routers = get_dashboard_routers()
@@ -163,6 +183,7 @@ def dashboard():
     )
 
 @web_bp.route("/alerts")
+@login_required
 def alerts():
     alert_widgets = get_alert_widgets()
     offline_routers = get_offline_routers()
