@@ -37,41 +37,95 @@
 
     <h2>Routers</h2>
 
-    <table>
+<input
+    type="text"
+    id="routerSearch"
+    class="search-box"
+    placeholder="Search by router name or description..."
+    onkeyup="filterRouters()"
+/>
 
-        <thead>
-            <tr>
-                <th>Router</th>
-                <th>Group</th>
-                <th>Model</th>
-                <th>WAN IP</th>
-                <th>State</th>
-                <th>Config Status</th>
-                <th>Alerts</th>
-                <th>Last Check</th>
-            </tr>
-        </thead>
+    <table id="routersTable">
+    <thead>
+        <tr>
+            <th>Router</th>
+            <th>Description</th>
+            <th>Group</th>
+            <th>Model</th>
+            <th>WAN IP</th>
+            <th>State</th>
+            <th>Config Status</th>
+            <th>Alerts</th>
+            <th>Last Check</th>
+        </tr>
+    </thead>
 
-        <tbody>
-
-            {% for router in routers %}
-
-            <tr>
-                <td>{{ router.name }}</td>
-                <td>{{ router.group_name }}</td>
-                <td>{{ router.full_product_name }}</td>
-                <td>{{ router.ipv4_address }}</td>
-                <td>{{ router.state }}</td>
-                <td>{{ router.config_status }}</td>
-                <td>{{ router.alert_count }}</td>
-                <td>{{ router.last_check }}</td>
-            </tr>
-
-            {% endfor %}
-
-        </tbody>
-
-    </table>
+    <tbody>
+        {% for router in routers %}
+        <tr>
+            <td>{{ router.name }}</td>
+            <td>{{ router.description }}</td>
+            <td>{{ router.group_name }}</td>
+            <td>{{ router.full_product_name }}</td>
+            <td>{{ router.ipv4_address }}</td>
+            <td>
+    {% if router.state and router.state|lower == "online" %}
+        <span class="status-online">{{ router.state }}</span>
+    {% else %}
+        <span class="status-offline">{{ router.state }}</span>
+    {% endif %}
+</td>
+            <td>
+    {% if router.config_status and "sync" in router.config_status|lower %}
+        <span class="config-good">
+            {{ router.config_status }}
+        </span>
+    {% else %}
+        <span class="config-warning">
+            {{ router.config_status }}
+        </span>
+    {% endif %}
+</td>
+            <td>
+    {% if router.alert_count > 0 %}
+        <span class="alert-bad">
+            {{ router.alert_count }}
+        </span>
+    {% else %}
+        <span class="alert-good">
+            0
+        </span>
+    {% endif %}
+</td>
+            <td>{{ router.last_check }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 </body>
+<script>
+function filterRouters() {
+    const input = document.getElementById("routerSearch");
+    const filter = input.value.toLowerCase();
+    const table = document.getElementById("routersTable");
+    const rows = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < rows.length; i++) {
+        const routerName = rows[i].getElementsByTagName("td")[0];
+        const description = rows[i].getElementsByTagName("td")[1];
+
+        if (routerName || description) {
+            const routerText = routerName.textContent || routerName.innerText;
+            const descriptionText = description.textContent || description.innerText;
+
+            const match =
+                routerText.toLowerCase().includes(filter) ||
+                descriptionText.toLowerCase().includes(filter);
+
+            rows[i].style.display = match ? "" : "none";
+        }
+    }
+}
+</script>
 </html>
