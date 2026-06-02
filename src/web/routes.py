@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template
+from src.repositories.dashboard_repository import get_alert_widgets
 
 from src.repositories.dashboard_repository import (
     format_duration,
@@ -31,4 +32,15 @@ def dashboard():
         "dashboard.html",
         summary=summary,
         routers=routers,
+        last_inventory_poll=last_inventory_poll,
+        last_status_poll=last_status_poll,
+    )
+
+@web_bp.route("/alerts")
+def alerts():
+    alert_widgets = get_alert_widgets()
+
+    return render_template(
+        "alerts.html",
+        alert_widgets=alert_widgets,
     )

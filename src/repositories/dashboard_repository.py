@@ -64,6 +64,86 @@ def get_last_poll_by_type(execution_type: str) -> dict[str, Any] | None:
             "notes": row.notes,
         }
 
+def get_alert_widgets() -> list[dict[str, Any]]:
+    query = """
+        SELECT
+            gd.gpio_name,
+            gsc.human_status,
+            COUNT(*) AS total
+        FROM dbo.gpio_status_current gsc
+        JOIN dbo.gpio_definitions gd
+            ON gsc.gpio_definition_id = gd.id
+        WHERE gsc.is_alert = 1
+        GROUP BY
+            gd.gpio_name,
+            gsc.human_status
+        ORDER BY total DESC;
+    """
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+        widgets = []
+
+        for row in rows:
+            widgets.append({
+                "gpio_name": row.gpio_name,
+                "human_status": row.human_status,
+                "total": row.total,
+                "routers": get_routers_by_alert(row.gpio_name, row.human_status),
+            })
+
+        return widgets
+
+
+def get_routers_by_alert(gpio_name: str, human_status: str) -> list[dict[str, Any]]:
+    query = """
+        SELECT
+            r.name,
+            r.description,
+            g.name AS group_name,
+            r.full_product_name,
+            w.ipv4_address,
+            gsc.raw_value,
+            gsc.human_status,
+            gsc.checked_at
+        FROM dbo.gpio_status_current gsc
+        JOIN dbo.gpio_definitions gd
+            ON gsc.gpio_definition_id = gd.id
+        JOIN dbo.routers r
+            ON gsc.router_id = r.id
+        LEFT JOIN dbo.groups g
+            ON r.group_id = g.id
+        LEFT JOIN dbo.router_wan_interfaces w
+            ON r.id = w.router_id
+            AND w.is_selected = 1
+        WHERE
+            gsc.is_alert = 1
+            AND gd.gpio_name = ?
+            AND gsc.human_status = ?
+        ORDER BY r.name;
+    """
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query, gpio_name, human_status)
+        rows = cursor.fetchall()
+
+        return [
+            {
+                "name": row.name,
+                "description": row.description,
+                "group_name": row.group_name,
+                "full_product_name": row.full_product_name,
+                "ipv4_address": row.ipv4_address,
+                "raw_value": row.raw_value,
+                "human_status": row.human_status,
+                "checked_at": row.checked_at,
+            }
+            for row in rows
+        ]
 
 def format_duration(seconds: int | None) -> str:
     if seconds is None:

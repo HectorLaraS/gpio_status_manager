@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GPIO Alerts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <h1>GPIO Alerts</h1>
+
+    <p>
+        <a href="/">Back to Dashboard</a>
+    </p>
+
+    {% if alert_widgets %}
+
+        {% for widget in alert_widgets %}
+
+            <div class="alert-widget">
+                <h2>{{ widget.gpio_name }} - {{ widget.human_status }}</h2>
+                <p class="alert-total">Affected routers: {{ widget.total }}</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Router</th>
+                            <th>Description</th>
+                            <th>Group</th>
+                            <th>Model</th>
+                            <th>WAN IP</th>
+                            <th>Status</th>
+                            <th>Last Check</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for router in widget.routers %}
+                        <tr>
+                            <td>{{ router.name }}</td>
+                            <td>{{ router.description }}</td>
+                            <td>{{ router.group_name }}</td>
+                            <td>{{ router.full_product_name }}</td>
+                            <td>{{ router.ipv4_address }}</td>
+                            <td>{{ router.human_status }}</td>
+                            <td>{{ router.checked_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="card online">
+            <h2>No active GPIO alerts</h2>
+            <p>All monitored GPIO statuses are currently normal.</p>
+        </div>
+
+    {% endif %}
+
+</body>
+</html>
