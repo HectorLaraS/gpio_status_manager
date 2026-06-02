@@ -2,6 +2,39 @@ from typing import Any
 
 from src.repositories.db import get_connection
 
+def get_active_incident_rules() -> list[dict[str, Any]]:
+    query = """
+        SELECT
+            id,
+            rule_key,
+            rule_name,
+            alert_source,
+            alert_match,
+            duration_minutes,
+            priority,
+            is_active
+        FROM dbo.incident_rules
+        WHERE is_active = 1;
+    """
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+        return [
+            {
+                "id": row.id,
+                "rule_key": row.rule_key,
+                "rule_name": row.rule_name,
+                "alert_source": row.alert_source,
+                "alert_match": row.alert_match,
+                "duration_minutes": row.duration_minutes,
+                "priority": row.priority,
+                "is_active": bool(row.is_active),
+            }
+            for row in rows
+        ]
 
 def update_incident_rule(
     rule_id: int,
