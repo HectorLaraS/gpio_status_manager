@@ -34,6 +34,37 @@
         </div>
 
     </div>
+    <h2>Poll Status</h2>
+
+<div class="summary-container">
+
+    <div class="card">
+        <h3>Last Inventory Poll</h3>
+
+        {% if last_inventory_poll %}
+            <p class="small-text">Status: {{ last_inventory_poll.status }}</p>
+            <p class="small-text">Duration: {{ last_inventory_poll.duration }}</p>
+            <p class="small-text">Routers: {{ last_inventory_poll.routers_processed }}</p>
+            <p class="small-text">Finished: {{ last_inventory_poll.finished_at }}</p>
+        {% else %}
+            <p>No inventory poll found</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Last Status Poll</h3>
+
+        {% if last_status_poll %}
+            <p class="small-text">Status: {{ last_status_poll.status }}</p>
+            <p class="small-text">Duration: {{ last_status_poll.duration }}</p>
+            <p class="small-text">Routers: {{ last_status_poll.routers_processed }}</p>
+            <p class="small-text">Finished: {{ last_status_poll.finished_at }}</p>
+        {% else %}
+            <p>No status poll found</p>
+        {% endif %}
+    </div>
+
+</div>
 
     <h2>Routers</h2>
 

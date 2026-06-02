@@ -100,3 +100,9 @@ tr:hover {
     color: #f44336;
     font-weight: bold;
 }
+
+.small-text {
+    font-size: 13px;
+    margin: 5px 0;
+    color: #d0d0d0;
+}
