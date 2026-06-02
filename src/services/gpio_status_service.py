@@ -21,20 +21,9 @@ def resolve_human_status(gpio_definition: dict[str, Any], raw_value: int | None)
 
 
 def resolve_is_alert(gpio_definition: dict[str, Any], raw_value: int | None) -> bool:
-    """
-    Regla inicial:
-    - Para inputs, asumimos que high_state_name representa alarma si no es estado normal.
-    - Casos conocidos:
-      Battery voltage: 1 = Bad => alerta
-      Line power Crossing: 1 = Power off => alerta
-      Solar Power: 0 = Battery Voltage Low => alerta
-      Power reset relay es output, no alerta.
-    """
-
     if raw_value is None:
         return False
 
-    gpio_name = (gpio_definition.get("gpio_name") or "").lower()
     direction = (gpio_definition.get("direction") or "").lower()
     human_status = (resolve_human_status(gpio_definition, raw_value) or "").lower()
 
@@ -57,10 +46,22 @@ def sync_gpio_status_for_router(
     router_db_id: int,
     wan_ip: str,
 ) -> int:
+    print(
+        f"ENTER sync_gpio_status_for_router | "
+        f"router={router_db_id} | wan_ip={wan_ip}"
+    )
+
     client = NcosClient()
 
     try:
         gpio_status = client.get_gpio_status(wan_ip)
+
+        print(
+            f"GPIO STATUS KEYS | "
+            f"router={router_db_id} | "
+            f"keys={list(gpio_status.keys())}"
+        )
+
     except RuntimeError as error:
         print(
             f"  WARNING | NCOS gpio status failed | "
@@ -70,17 +71,32 @@ def sync_gpio_status_for_router(
 
     gpio_definitions = get_gpio_definitions_by_router(router_db_id)
 
+    print(
+        f"GPIO DEFINITIONS FOUND | "
+        f"router={router_db_id} | "
+        f"count={len(gpio_definitions)}"
+    )
+
     total = 0
 
     for gpio_definition in gpio_definitions:
         status_key = gpio_definition.get("status_key")
 
         if not status_key:
+            print(
+                f"SKIP GPIO | router={router_db_id} | "
+                f"gpio={gpio_definition.get('id')} | reason=no_status_key"
+            )
             continue
 
         raw_value = gpio_status.get(status_key)
 
         if raw_value is None:
+            print(
+                f"SKIP GPIO | router={router_db_id} | "
+                f"gpio={gpio_definition.get('id')} | "
+                f"status_key={status_key} | reason=raw_value_none"
+            )
             continue
 
         try:
@@ -103,7 +119,9 @@ def sync_gpio_status_for_router(
             f"router={router_db_id} | "
             f"gpio={gpio_definition['id']} | "
             f"status_key={status_key} | "
-            f"value={raw_value}"
+            f"value={raw_value} | "
+            f"human={human_status} | "
+            f"is_alert={is_alert}"
         )
 
         upsert_gpio_status_current(
@@ -116,5 +134,10 @@ def sync_gpio_status_for_router(
         )
 
         total += 1
+
+    print(
+        f"EXIT sync_gpio_status_for_router | "
+        f"router={router_db_id} | total={total}"
+    )
 
     return total
