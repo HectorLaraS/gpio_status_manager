@@ -84,6 +84,7 @@ def main() -> None:
                     print(f"INVENTORY POLL TRIGGERED | {now}")
                     run_inventory_poll_execution()
                     last_inventory_key = inventory_key
+                    continue
 
             if should_run_status_poll(
                 now=now,
