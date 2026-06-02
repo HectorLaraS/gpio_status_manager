@@ -6,6 +6,9 @@ from src.repositories.poll_repository import (
 )
 from src.services.inventory_poll_service import run_inventory_poll
 from src.services.status_poll_service import run_status_poll
+from src.services.alert_engine_execution_service import (
+    run_alert_engine_execution,
+)
 
 
 def run_inventory_poll_execution() -> None:
@@ -16,6 +19,9 @@ def run_inventory_poll_execution() -> None:
         return
 
     execution_id = start_poll_execution(execution_type)
+
+    print("RUNNING ALERT ENGINE AFTER INVENTORY POLL")
+    run_alert_engine_execution()
 
     print("=" * 80)
     print(f"INVENTORY POLL EXECUTION STARTED | execution_id={execution_id}")
@@ -81,6 +87,9 @@ def run_status_poll_execution() -> None:
         return
 
     execution_id = start_poll_execution(execution_type)
+
+    print("RUNNING ALERT ENGINE AFTER STATUS POLL")
+    run_alert_engine_execution()
 
     print("=" * 80)
     print(f"STATUS POLL EXECUTION STARTED | execution_id={execution_id}")
