@@ -143,6 +143,27 @@ def upsert_gpio_status_current(
         OUTPUT inserted.id;
     """
 
+    history_query = """
+        INSERT INTO dbo.gpio_status_history (
+            router_id,
+            gpio_definition_id,
+            status_key,
+            raw_value,
+            human_status,
+            is_alert,
+            detected_at
+        )
+        VALUES (
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            SYSUTCDATETIME()
+        );
+    """
+
     params = (
         router_db_id,
         gpio_definition_id,
@@ -152,20 +173,31 @@ def upsert_gpio_status_current(
         1 if is_alert else 0,
     )
 
+    history_params = (
+        router_db_id,
+        gpio_definition_id,
+        status_key,
+        None if raw_value is None else str(raw_value),
+        human_status,
+        1 if is_alert else 0,
+    )
+
     with get_connection() as conn:
         cursor = conn.cursor()
+
         cursor.execute(query, params)
         row = cursor.fetchone()
+
+        if row is None:
+            raise RuntimeError(
+                f"No row returned from gpio_status_current MERGE "
+                f"router_id={router_db_id}, gpio_definition_id={gpio_definition_id}"
+            )
+
+        status_current_id = row[0]
+
+        cursor.execute(history_query, history_params)
+
         conn.commit()
 
-    insert_gpio_status_history(
-        router_db_id=router_db_id,
-        gpio_definition_id=gpio_definition_id,
-        status_key=status_key,
-        raw_value=raw_value,
-        human_status=human_status,
-        is_alert=is_alert,
-    )
-    print(f"HISTORY INSERT | router={router_db_id} | gpio={gpio_definition_id} | status={human_status}")
-
-    return row[0]
+        return status_current_id
