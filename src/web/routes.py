@@ -9,6 +9,10 @@ from src.repositories.alert_dashboard_repository import (
     get_top_affected_routers,
     get_last_execution_by_type,
 )
+from src.repositories.auth_repository import (
+    create_user,
+    get_all_users,
+)
 
 from flask import (
     render_template,
@@ -51,6 +55,37 @@ from src.repositories.incident_rule_repository import (
 )
 
 web_bp = Blueprint("web", __name__)
+
+@web_bp.route("/users")
+@roles_required("ADMINISTRATOR")
+def users():
+    users_list = get_all_users()
+
+    return render_template(
+        "users.html",
+        users=users_list,
+    )
+
+
+@web_bp.route("/users/create", methods=["GET", "POST"])
+@roles_required("ADMINISTRATOR")
+def create_user_route():
+    if request.method == "POST":
+        username = request.form["username"].strip()
+        display_name = request.form["display_name"].strip()
+        password = request.form["password"]
+        role_name = request.form["role_name"]
+
+        create_user(
+            username=username,
+            display_name=display_name,
+            password=password,
+            role_name=role_name,
+        )
+
+        return redirect("/users")
+
+    return render_template("create_user.html")
 
 @web_bp.route("/alert-dashboard")
 @login_required

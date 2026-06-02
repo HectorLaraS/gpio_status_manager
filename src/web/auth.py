@@ -2,6 +2,10 @@ from functools import wraps
 
 from flask import redirect, request, session
 
+from werkzeug.security import generate_password_hash
+
+
+
 
 def login_required(view_func):
     @wraps(view_func)

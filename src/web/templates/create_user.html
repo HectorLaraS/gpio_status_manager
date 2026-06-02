@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create User</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h1>Create User</h1>
+
+<p>
+    <a href="/users">Back to Users</a>
+</p>
+
+<div class="rule-card">
+
+    <form method="POST">
+
+        <label>Username</label>
+        <input type="text" name="username" required>
+
+        <br><br>
+
+        <label>Display Name</label>
+        <input type="text" name="display_name" required>
+
+        <br><br>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <br><br>
+
+        <label>Role</label>
+        <select name="role_name">
+            <option value="VIEWER">VIEWER</option>
+            <option value="ENGINEER">ENGINEER</option>
+            <option value="ADMINISTRATOR">ADMINISTRATOR</option>
+        </select>
+
+        <br><br>
+
+        <button type="submit">Create User</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

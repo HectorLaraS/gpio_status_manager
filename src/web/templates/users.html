@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Administration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h1>User Administration</h1>
+
+<p>
+    <a href="/">Home</a> |
+    <a href="/users/create">Create User</a>
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Display Name</th>
+            <th>Role</th>
+            <th>Enabled</th>
+            <th>Created</th>
+            <th>Last Login</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.display_name }}</td>
+            <td>{{ user.role_name }}</td>
+            <td>{{ user.is_active }}</td>
+            <td>{{ user.created_at }}</td>
+            <td>{{ user.last_login_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>
