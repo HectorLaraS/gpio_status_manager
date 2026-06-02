@@ -98,6 +98,14 @@ def sync_gpio_status_for_router(
             raw_value=raw_value,
         )
 
+        print(
+            f"CALLING UPSERT | "
+            f"router={router_db_id} | "
+            f"gpio={gpio_definition['id']} | "
+            f"status_key={status_key} | "
+            f"value={raw_value}"
+        )
+
         upsert_gpio_status_current(
             router_db_id=router_db_id,
             gpio_definition_id=gpio_definition["id"],
