@@ -1,6 +1,14 @@
 from flask import Blueprint, render_template
 from src.repositories.dashboard_repository import get_alert_widgets
 
+from src.repositories.alert_dashboard_repository import (
+    get_alerts_by_type,
+    get_open_alerts_summary,
+    get_recently_closed_alerts,
+    get_recently_opened_alerts,
+    get_top_affected_routers,
+)
+
 from src.repositories.dashboard_repository import (
     format_duration,
     get_dashboard_routers,
@@ -22,6 +30,23 @@ from src.repositories.incident_rule_repository import (
 )
 
 web_bp = Blueprint("web", __name__)
+
+@web_bp.route("/alert-dashboard")
+def alert_dashboard():
+    summary = get_open_alerts_summary()
+    alerts_by_type = get_alerts_by_type()
+    recently_opened = get_recently_opened_alerts()
+    recently_closed = get_recently_closed_alerts()
+    top_routers = get_top_affected_routers()
+
+    return render_template(
+        "alert_dashboard.html",
+        summary=summary,
+        alerts_by_type=alerts_by_type,
+        recently_opened=recently_opened,
+        recently_closed=recently_closed,
+        top_routers=top_routers,
+    )
 
 @web_bp.route("/incident-rules")
 def incident_rules():

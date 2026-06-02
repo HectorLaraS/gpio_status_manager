@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alert Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<h1>Alert Dashboard</h1>
+
+<p>
+    <a href="/">Dashboard</a> |
+    <a href="/alerts">Operational Alerts</a> |
+    <a href="/incident-rules">Alert Rules</a>
+</p>
+
+<div class="summary-container">
+
+    <div class="card alert">
+        <h3>Open Alerts</h3>
+        <p>{{ summary.total_open }}</p>
+    </div>
+
+    <div class="card">
+        <h3>P1</h3>
+        <p>{{ summary.p1 }}</p>
+    </div>
+
+    <div class="card">
+        <h3>P2</h3>
+        <p>{{ summary.p2 }}</p>
+    </div>
+
+    <div class="card">
+        <h3>P3</h3>
+        <p>{{ summary.p3 }}</p>
+    </div>
+
+    <div class="card">
+        <h3>P4</h3>
+        <p>{{ summary.p4 }}</p>
+    </div>
+
+    <div class="card">
+        <h3>P5</h3>
+        <p>{{ summary.p5 }}</p>
+    </div>
+
+</div>
+
+<h2>Alerts by Type</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Alert Type</th>
+            <th>Total Open</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in alerts_by_type %}
+        <tr>
+            <td>{{ item.rule_name }}</td>
+            <td>{{ item.total }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Recently Opened</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Alert</th>
+            <th>Priority</th>
+            <th>Title</th>
+            <th>Router</th>
+            <th>Description</th>
+            <th>Opened</th>
+            <th>Last Seen</th>
+            <th>Occurrences</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for alert in recently_opened %}
+        <tr>
+            <td>{{ alert.alert_number }}</td>
+            <td>{{ alert.priority }}</td>
+            <td>{{ alert.title }}</td>
+            <td>{{ alert.router_name }}</td>
+            <td>{{ alert.router_description }}</td>
+            <td>{{ alert.opened_at }}</td>
+            <td>{{ alert.last_detected_at }}</td>
+            <td>{{ alert.occurrence_count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Recently Closed</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Alert</th>
+            <th>Priority</th>
+            <th>Title</th>
+            <th>Router</th>
+            <th>Description</th>
+            <th>Opened</th>
+            <th>Closed</th>
+            <th>Occurrences</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for alert in recently_closed %}
+        <tr>
+            <td>{{ alert.alert_number }}</td>
+            <td>{{ alert.priority }}</td>
+            <td>{{ alert.title }}</td>
+            <td>{{ alert.router_name }}</td>
+            <td>{{ alert.router_description }}</td>
+            <td>{{ alert.opened_at }}</td>
+            <td>{{ alert.closed_at }}</td>
+            <td>{{ alert.occurrence_count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Top Affected Routers</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Router</th>
+            <th>Description</th>
+            <th>Total Alerts</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for router in top_routers %}
+        <tr>
+            <td>{{ router.router_name }}</td>
+            <td>{{ router.router_description }}</td>
+            <td>{{ router.total_alerts }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>
