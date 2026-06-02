@@ -44,6 +44,48 @@ def get_gpio_definitions_by_router(router_db_id: int) -> list[dict[str, Any]]:
             for row in rows
         ]
 
+def insert_gpio_status_history(
+    router_db_id: int,
+    gpio_definition_id: int,
+    status_key: str,
+    raw_value: int | str | None,
+    human_status: str | None,
+    is_alert: bool,
+) -> None:
+    query = """
+        INSERT INTO dbo.gpio_status_history (
+            router_id,
+            gpio_definition_id,
+            status_key,
+            raw_value,
+            human_status,
+            is_alert,
+            detected_at
+        )
+        VALUES (
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            SYSUTCDATETIME()
+        );
+    """
+
+    params = (
+        router_db_id,
+        gpio_definition_id,
+        status_key,
+        None if raw_value is None else str(raw_value),
+        human_status,
+        1 if is_alert else 0,
+    )
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query, params)
+        conn.commit()
 
 def upsert_gpio_status_current(
     router_db_id: int,
@@ -116,4 +158,13 @@ def upsert_gpio_status_current(
         row = cursor.fetchone()
         conn.commit()
 
-        return row[0]
+    insert_gpio_status_history(
+        router_db_id=router_db_id,
+        gpio_definition_id=gpio_definition_id,
+        status_key=status_key,
+        raw_value=raw_value,
+        human_status=human_status,
+        is_alert=is_alert,
+    )
+
+    return row[0]
