@@ -14,8 +14,46 @@ from src.repositories.dashboard_repository import (
     get_offline_routers,
 )
 
+from flask import request, redirect, url_for
+
+from src.repositories.incident_rule_repository import (
+    get_incident_rules,
+    update_incident_rule,
+)
+
 web_bp = Blueprint("web", __name__)
 
+@web_bp.route("/incident-rules")
+def incident_rules():
+
+    rules = get_incident_rules()
+
+    return render_template(
+        "incident_rules.html",
+        rules=rules,
+    )
+
+@web_bp.route("/incident-rules/update", methods=["POST"])
+def update_incident_rule_route():
+
+    rule_id = int(request.form["rule_id"])
+    duration_minutes = int(request.form["duration_minutes"])
+    priority = request.form["priority"]
+
+    is_active = (
+        request.form.get("is_active") == "on"
+    )
+
+    update_incident_rule(
+        rule_id=rule_id,
+        duration_minutes=duration_minutes,
+        priority=priority,
+        is_active=is_active,
+    )
+
+    return redirect(
+        url_for("web.incident_rules")
+    )
 
 @web_bp.route("/")
 def dashboard():

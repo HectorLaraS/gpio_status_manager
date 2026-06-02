@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Incident Rules</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<h1>Incident Rules</h1>
+
+<p>
+    <a href="/">Dashboard</a>
+</p>
+
+{% for rule in rules %}
+
+<div class="rule-card">
+
+    <form
+        method="POST"
+        action="/incident-rules/update"
+    >
+
+        <input
+            type="hidden"
+            name="rule_id"
+            value="{{ rule.id }}"
+        >
+
+        <h2>{{ rule.rule_name }}</h2>
+
+        <p>
+            Source:
+            {{ rule.alert_source }}
+        </p>
+
+        <p>
+            Match:
+            {{ rule.alert_match }}
+        </p>
+
+        <label>
+            Duration (minutes)
+        </label>
+
+        <input
+            type="number"
+            name="duration_minutes"
+            value="{{ rule.duration_minutes }}"
+            min="1"
+        >
+
+        <br><br>
+
+        <label>
+            Priority
+        </label>
+
+        <select name="priority">
+
+            <option value="P1"
+                {% if rule.priority == "P1" %}selected{% endif %}
+            >
+                P1
+            </option>
+
+            <option value="P2"
+                {% if rule.priority == "P2" %}selected{% endif %}
+            >
+                P2
+            </option>
+
+            <option value="P3"
+                {% if rule.priority == "P3" %}selected{% endif %}
+            >
+                P3
+            </option>
+
+            <option value="P4"
+                {% if rule.priority == "P4" %}selected{% endif %}
+            >
+                P4
+            </option>
+
+            <option value="P5"
+                {% if rule.priority == "P5" %}selected{% endif %}
+            >
+                P5
+            </option>
+
+        </select>
+
+        <br><br>
+
+        <label>
+
+            <input
+                type="checkbox"
+                name="is_active"
+                {% if rule.is_active %}checked{% endif %}
+            >
+
+            Enabled
+
+        </label>
+
+        <br><br>
+
+        <button type="submit">
+            Save
+        </button>
+
+    </form>
+
+</div>
+
+{% endfor %}
+
+</body>
+</html>
