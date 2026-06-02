@@ -8,6 +8,12 @@ from src.repositories.dashboard_repository import (
     get_last_poll_by_type,
 )
 
+from src.repositories.dashboard_repository import (
+    get_alert_widgets,
+    get_config_pending_routers,
+    get_offline_routers,
+)
+
 web_bp = Blueprint("web", __name__)
 
 
@@ -39,8 +45,12 @@ def dashboard():
 @web_bp.route("/alerts")
 def alerts():
     alert_widgets = get_alert_widgets()
+    offline_routers = get_offline_routers()
+    config_pending_routers = get_config_pending_routers()
 
     return render_template(
         "alerts.html",
         alert_widgets=alert_widgets,
+        offline_routers=offline_routers,
+        config_pending_routers=config_pending_routers,
     )

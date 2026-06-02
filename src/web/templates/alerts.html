@@ -61,5 +61,73 @@
 
     {% endif %}
 
+    <h1>Router Health Alerts</h1>
+
+<div class="alert-widget">
+    <h2>Offline Routers</h2>
+    <p class="alert-total">Affected routers: {{ offline_routers|length }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Router</th>
+                <th>Description</th>
+                <th>Group</th>
+                <th>Model</th>
+                <th>WAN IP</th>
+                <th>State</th>
+                <th>Last Seen</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for router in offline_routers %}
+            <tr>
+                <td>{{ router.name }}</td>
+                <td>{{ router.description }}</td>
+                <td>{{ router.group_name }}</td>
+                <td>{{ router.full_product_name }}</td>
+                <td>{{ router.ipv4_address }}</td>
+                <td>{{ router.state }}</td>
+                <td>{{ router.last_seen_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h1>Configuration Alerts</h1>
+
+<div class="alert-widget warning-widget">
+    <h2>Config Pending / Not Synced</h2>
+    <p class="warning-total">Affected routers: {{ config_pending_routers|length }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Router</th>
+                <th>Description</th>
+                <th>Group</th>
+                <th>Model</th>
+                <th>WAN IP</th>
+                <th>Config Status</th>
+                <th>Updated At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for router in config_pending_routers %}
+            <tr>
+                <td>{{ router.name }}</td>
+                <td>{{ router.description }}</td>
+                <td>{{ router.group_name }}</td>
+                <td>{{ router.full_product_name }}</td>
+                <td>{{ router.ipv4_address }}</td>
+                <td>{{ router.config_status }}</td>
+                <td>{{ router.updated_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 </body>
 </html>

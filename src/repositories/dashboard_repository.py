@@ -161,6 +161,91 @@ def format_duration(seconds: int | None) -> str:
 
     return f"{remaining_seconds}s"
 
+def get_offline_routers() -> list[dict[str, Any]]:
+    query = """
+        SELECT
+            r.name,
+            r.description,
+            g.name AS group_name,
+            r.full_product_name,
+            r.state,
+            w.ipv4_address,
+            r.last_seen_at
+        FROM dbo.routers r
+        LEFT JOIN dbo.groups g
+            ON r.group_id = g.id
+        LEFT JOIN dbo.router_wan_interfaces w
+            ON r.id = w.router_id
+            AND w.is_selected = 1
+        WHERE
+            r.is_active = 1
+            AND (r.state <> 'online' OR r.state IS NULL)
+        ORDER BY r.name;
+    """
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+        return [
+            {
+                "name": row.name,
+                "description": row.description,
+                "group_name": row.group_name,
+                "full_product_name": row.full_product_name,
+                "state": row.state,
+                "ipv4_address": row.ipv4_address,
+                "last_seen_at": row.last_seen_at,
+            }
+            for row in rows
+        ]
+
+
+def get_config_pending_routers() -> list[dict[str, Any]]:
+    query = """
+        SELECT
+            r.name,
+            r.description,
+            g.name AS group_name,
+            r.full_product_name,
+            r.config_status,
+            w.ipv4_address,
+            r.updated_at
+        FROM dbo.routers r
+        LEFT JOIN dbo.groups g
+            ON r.group_id = g.id
+        LEFT JOIN dbo.router_wan_interfaces w
+            ON r.id = w.router_id
+            AND w.is_selected = 1
+        WHERE
+            r.is_active = 1
+            AND (
+                r.config_status IS NULL
+                OR LOWER(r.config_status) NOT LIKE '%sync%'
+                OR LOWER(r.config_status) LIKE '%pending%'
+            )
+        ORDER BY r.name;
+    """
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+        return [
+            {
+                "name": row.name,
+                "description": row.description,
+                "group_name": row.group_name,
+                "full_product_name": row.full_product_name,
+                "config_status": row.config_status,
+                "ipv4_address": row.ipv4_address,
+                "updated_at": row.updated_at,
+            }
+            for row in rows
+        ]
+
 def get_dashboard_routers() -> list[dict[str, Any]]:
     query = """
         SELECT
