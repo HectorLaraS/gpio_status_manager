@@ -166,5 +166,6 @@ def upsert_gpio_status_current(
         human_status=human_status,
         is_alert=is_alert,
     )
+    print(f"HISTORY INSERT | router={router_db_id} | gpio={gpio_definition_id} | status={human_status}")
 
     return row[0]
