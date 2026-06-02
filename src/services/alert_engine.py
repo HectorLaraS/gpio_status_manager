@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
 
 from src.repositories.alert_repository import (
+    close_alert,
     create_alert,
     get_open_alert,
+    get_open_alerts,
     update_alert_seen,
 )
 from src.repositories.db import get_connection
@@ -44,7 +46,10 @@ def get_active_gpio_conditions() -> list[dict]:
                 "first_detected_at": row.first_detected_at,
                 "last_detected_at": row.last_detected_at,
                 "title": f"{row.gpio_name} - {row.human_status}",
-                "description": f"GPIO alert detected: {row.gpio_name} = {row.human_status}",
+                "description": (
+                    f"GPIO alert detected: "
+                    f"{row.gpio_name} = {row.human_status}"
+                ),
             }
             for row in rows
         ]
@@ -115,7 +120,7 @@ def get_active_config_conditions() -> list[dict]:
 
 
 def rule_matches_condition(rule: dict, condition: dict) -> bool:
-    if rule["alert_source"] != condition["source"]:
+    if rule["alert_source"].lower() != condition["source"].lower():
         return False
 
     return rule["alert_match"].lower() == condition["match"].lower()
@@ -163,10 +168,67 @@ def evaluate_alert_condition(rule: dict, condition: dict) -> None:
     )
 
 
+def build_active_condition_keys(
+    conditions: list[dict],
+    rules: list[dict],
+) -> set[tuple[int, int]]:
+    active_keys = set()
+
+    for condition in conditions:
+        for rule in rules:
+            if not rule_matches_condition(rule, condition):
+                continue
+
+            active_keys.add(
+                (
+                    condition["router_id"],
+                    rule["id"],
+                )
+            )
+
+    return active_keys
+
+
+def close_resolved_alerts(
+    conditions: list[dict],
+    rules: list[dict],
+) -> int:
+    active_keys = build_active_condition_keys(
+        conditions=conditions,
+        rules=rules,
+    )
+
+    open_alerts = get_open_alerts()
+
+    closed_count = 0
+
+    for alert in open_alerts:
+        alert_key = (
+            alert["router_id"],
+            alert["rule_id"],
+        )
+
+        if alert_key in active_keys:
+            continue
+
+        close_alert(alert["id"])
+        closed_count += 1
+
+        print(
+            f"ALERT CLOSED | "
+            f"alert_number={alert['alert_number']} | "
+            f"router_id={alert['router_id']} | "
+            f"rule_id={alert['rule_id']}"
+        )
+
+    return closed_count
+
+
 def run_alert_engine() -> dict:
     stats = {
         "conditions_processed": 0,
         "alerts_evaluated": 0,
+        "alerts_closed": 0,
     }
 
     rules = get_active_incident_rules()
@@ -186,10 +248,18 @@ def run_alert_engine() -> dict:
             evaluate_alert_condition(rule, condition)
             stats["alerts_evaluated"] += 1
 
+    closed_count = close_resolved_alerts(
+        conditions=conditions,
+        rules=rules,
+    )
+
+    stats["alerts_closed"] = closed_count
+
     print(
         f"ALERT ENGINE FINISHED | "
         f"conditions={stats['conditions_processed']} | "
-        f"evaluated={stats['alerts_evaluated']}"
+        f"evaluated={stats['alerts_evaluated']} | "
+        f"closed={stats['alerts_closed']}"
     )
 
     return stats
