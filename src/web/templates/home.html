@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GPIO Status Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<h1>GPIO Status Manager</h1>
+
+<p class="small-text">
+    Operational portal for Cradlepoint GPIO monitoring, alerting and polling health.
+</p>
+
+<div class="home-grid">
+
+    <a class="home-card" href="/dashboard">
+        <h2>Routers Dashboard</h2>
+        <p>View router inventory, status, WAN IPs, GPIO count and current alerts.</p>
+    </a>
+
+    <a class="home-card" href="/alert-dashboard">
+        <h2>Alert Dashboard</h2>
+        <p>View open alerts, recently opened/closed alerts and affected routers.</p>
+    </a>
+
+    <a class="home-card" href="/alerts">
+        <h2>Operational Alerts</h2>
+        <p>View GPIO alerts, offline routers and config pending/not synced devices.</p>
+    </a>
+
+    <a class="home-card" href="/incident-rules">
+        <h2>Alert Rules</h2>
+        <p>Configure duration, priority and enable/disable alert rules.</p>
+    </a>
+
+    <a class="home-card disabled-card" href="#">
+        <h2>Poll Executions</h2>
+        <p>Coming soon: review scheduler, inventory, status and alert engine executions.</p>
+    </a>
+
+    <a class="home-card disabled-card" href="#">
+        <h2>User Administration</h2>
+        <p>Coming soon: create users, assign roles and manage access.</p>
+    </a>
+
+</div>
+
+</body>
+</html>
