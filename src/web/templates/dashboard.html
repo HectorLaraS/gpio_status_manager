@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPIO Status Manager</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <h1>GPIO Status Manager</h1>
+
+    <div class="summary-container">
+
+        <div class="card">
+            <h3>Total Routers</h3>
+            <p>{{ summary.total_routers }}</p>
+        </div>
+
+        <div class="card online">
+            <h3>Online</h3>
+            <p>{{ summary.online_routers }}</p>
+        </div>
+
+        <div class="card offline">
+            <h3>Offline</h3>
+            <p>{{ summary.offline_routers }}</p>
+        </div>
+
+        <div class="card alert">
+            <h3>GPIO Alerts</h3>
+            <p>{{ summary.gpio_alerts }}</p>
+        </div>
+
+    </div>
+
+    <h2>Routers</h2>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Router</th>
+                <th>Group</th>
+                <th>Model</th>
+                <th>WAN IP</th>
+                <th>State</th>
+                <th>Config Status</th>
+                <th>Alerts</th>
+                <th>Last Check</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for router in routers %}
+
+            <tr>
+                <td>{{ router.name }}</td>
+                <td>{{ router.group_name }}</td>
+                <td>{{ router.full_product_name }}</td>
+                <td>{{ router.ipv4_address }}</td>
+                <td>{{ router.state }}</td>
+                <td>{{ router.config_status }}</td>
+                <td>{{ router.alert_count }}</td>
+                <td>{{ router.last_check }}</td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</body>
+</html>
