@@ -10,6 +10,17 @@ from src.repositories.alert_dashboard_repository import (
     get_last_execution_by_type,
 )
 
+from flask import (
+    render_template,
+    request,
+    redirect,
+    session,
+)
+
+from src.services.auth_service import (
+    authenticate_user,
+)
+
 from src.repositories.dashboard_repository import (
     format_duration,
     get_dashboard_routers,
@@ -90,6 +101,40 @@ def update_incident_rule_route():
 @web_bp.route("/")
 def home():
     return render_template("home.html")
+
+@web_bp.route(
+    "/login",
+    methods=["GET", "POST"],
+)
+def login():
+
+    if request.method == "POST":
+
+        username = request.form["username"]
+        password = request.form["password"]
+
+        user = authenticate_user(
+            username,
+            password,
+        )
+
+        if not user:
+            return render_template(
+                "login.html",
+                error="Invalid credentials",
+            )
+
+        session["user_id"] = user["id"]
+        session["username"] = user["username"]
+        session["display_name"] = user["display_name"]
+        session["role_name"] = user["role_name"]
+
+        return redirect("/")
+
+    return render_template(
+        "login.html",
+        error=None,
+    )
 
 @web_bp.route("/dashboard")
 def dashboard():
