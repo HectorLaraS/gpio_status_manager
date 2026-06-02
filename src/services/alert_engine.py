@@ -40,7 +40,7 @@ def get_active_gpio_conditions() -> list[dict]:
             {
                 "router_id": row.router_id,
                 "source": "GPIO",
-                "match": f"{row.gpio_name}|{row.human_status}",
+                "match": f"{row.gpio_name}:{row.human_status}",
                 "first_detected_at": row.first_detected_at,
                 "last_detected_at": row.last_detected_at,
                 "title": f"{row.gpio_name} - {row.human_status}",
