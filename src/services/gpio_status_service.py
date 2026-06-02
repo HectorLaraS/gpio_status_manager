@@ -55,6 +55,7 @@ def sync_gpio_status_for_router(
 
     try:
         gpio_status = client.get_gpio_status(wan_ip)
+        print(f"GPIO STATUS RAW | router={router_db_id} | data={gpio_status}")
 
         print(
             f"GPIO STATUS KEYS | "
@@ -70,6 +71,26 @@ def sync_gpio_status_for_router(
         return 0
 
     gpio_definitions = get_gpio_definitions_by_router(router_db_id)
+    if not gpio_definitions:
+        print(f"NO GPIO DEFINITIONS FOUND | router={router_db_id}")
+        return 0
+
+    print(
+        f"GPIO DEFINITIONS FOUND | "
+        f"router={router_db_id} | count={len(gpio_definitions)}"
+    )
+    if not gpio_definitions:
+        print(
+            f"NO GPIO DEFINITIONS FOUND | "
+            f"router={router_db_id}"
+        )
+        return 0
+
+    print(
+        f"GPIO DEFINITIONS FOUND | "
+        f"router={router_db_id} | "
+        f"count={len(gpio_definitions)}"
+    )
 
     print(
         f"GPIO DEFINITIONS FOUND | "

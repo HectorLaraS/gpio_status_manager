@@ -51,7 +51,7 @@ def run_status_poll() -> dict:
     routers = get_selected_wan_routers()
 
     # TEMP TEST: descomenta esta línea para probar solo 25 routers primero
-    ##routers = routers[:25]
+    routers = routers[:2]
 
     print(f"Routers con WAN seleccionada: {len(routers)}")
     print(f"Max workers: {settings.app.status_poll_max_workers}")
