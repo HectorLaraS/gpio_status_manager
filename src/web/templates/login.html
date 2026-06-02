@@ -1,38 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login</title>
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <title>Login | GPIO Status Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
-<body>
+<body class="login-body">
 
-<h1>GPIO Status Manager</h1>
+<div class="login-container">
 
-<form method="POST">
+    <div class="login-card">
 
-    <label>Username</label>
-    <input type="text"
-           name="username"
-           required>
+        <h1>GPIO Status Manager</h1>
 
-    <label>Password</label>
-    <input type="password"
-           name="password"
-           required>
+        <p class="login-subtitle">
+            Monitoring · Alerts · Operations
+        </p>
 
-    <button type="submit">
-        Login
-    </button>
+        <form method="POST">
 
-</form>
+            <label>Username</label>
+            <input
+                type="text"
+                name="username"
+                placeholder="Enter username"
+                required
+            >
 
-{% if error %}
-<p style="color:red;">
-    {{ error }}
-</p>
-{% endif %}
+            <label>Password</label>
+            <input
+                type="password"
+                name="password"
+                placeholder="Enter password"
+                required
+            >
+
+            <button type="submit" class="login-button">
+                Login
+            </button>
+
+        </form>
+
+        {% if error %}
+            <p class="login-error">
+                {{ error }}
+            </p>
+        {% endif %}
+
+    </div>
+
+</div>
 
 </body>
 </html>
