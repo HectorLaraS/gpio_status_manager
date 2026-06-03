@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Poll Execution Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<h1>Poll Execution Details</h1>
+
+<p>
+    <a href="/poll-executions">
+        Back to Executions
+    </a>
+</p>
+
+<div class="rule-card">
+
+    <h2>Execution Summary</h2>
+
+    <p><strong>Execution ID:</strong> {{ execution.execution_id }}</p>
+
+    <p><strong>Type:</strong> {{ execution.execution_type }}</p>
+
+    <p><strong>Status:</strong> {{ execution.status }}</p>
+
+    <p><strong>Started:</strong> {{ execution.started_at }}</p>
+
+    <p><strong>Finished:</strong> {{ execution.finished_at }}</p>
+
+</div>
+
+<br>
+
+<div class="rule-card">
+
+    <h2>Statistics</h2>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Groups</th>
+                <th>Routers</th>
+                <th>Success</th>
+                <th>Failed</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>{{ execution.groups_processed }}</td>
+                <td>{{ execution.routers_processed }}</td>
+                <td>{{ execution.routers_success }}</td>
+                <td>{{ execution.routers_failed }}</td>
+            </tr>
+        </tbody>
+
+    </table>
+
+</div>
+
+<br>
+
+<div class="rule-card">
+
+    <h2>Notes</h2>
+
+    <pre>{{ execution.notes }}</pre>
+
+</div>
+
+<br>
+
+<h2>Execution Logs</h2>
+
+<table>
+
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Level</th>
+            <th>Source</th>
+            <th>Router</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for log in logs %}
+
+        <tr>
+
+            <td>{{ log.created_at }}</td>
+
+            <td>{{ log.level_name }}</td>
+
+            <td>{{ log.source }}</td>
+
+            <td>{{ log.router_id }}</td>
+
+            <td>{{ log.message }}</td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+</body>
+</html>

@@ -15,6 +15,7 @@
 </p>
 
 <table>
+
     <thead>
         <tr>
             <th>Type</th>
@@ -27,25 +28,46 @@
             <th>Success</th>
             <th>Failed</th>
             <th>Notes</th>
+            <th>Details</th>
         </tr>
     </thead>
 
     <tbody>
+
         {% for execution in executions %}
         <tr>
+
             <td>{{ execution.execution_type }}</td>
+
             <td>{{ execution.status }}</td>
+
             <td>{{ execution.started_at }}</td>
+
             <td>{{ execution.finished_at }}</td>
+
             <td>{{ execution.duration }}</td>
+
             <td>{{ execution.groups_processed }}</td>
+
             <td>{{ execution.routers_processed }}</td>
+
             <td>{{ execution.routers_success }}</td>
+
             <td>{{ execution.routers_failed }}</td>
+
             <td>{{ execution.notes }}</td>
+
+            <td>
+                <a href="/poll-executions/{{ execution.execution_id }}">
+                    View
+                </a>
+            </td>
+
         </tr>
         {% endfor %}
+
     </tbody>
+
 </table>
 
 </body>

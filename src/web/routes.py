@@ -52,6 +52,11 @@ from src.services.auth_service import (
     authenticate_user,
 )
 
+from src.repositories.poll_execution_details_repository import (
+    get_poll_execution_by_execution_id,
+    get_poll_logs_by_execution_id,
+)
+
 from src.repositories.dashboard_repository import (
     format_duration,
     get_dashboard_routers,
@@ -91,6 +96,26 @@ def users():
     return render_template(
         "users.html",
         users=users_list,
+    )
+
+@web_bp.route("/poll-executions/<execution_id>")
+@login_required
+def poll_execution_details(execution_id: str):
+    execution = get_poll_execution_by_execution_id(
+        execution_id=execution_id,
+    )
+
+    if not execution:
+        return redirect("/poll-executions")
+
+    logs = get_poll_logs_by_execution_id(
+        execution_id=execution_id,
+    )
+
+    return render_template(
+        "poll_execution_details.html",
+        execution=execution,
+        logs=logs,
     )
 
 @web_bp.route("/poll-executions")
