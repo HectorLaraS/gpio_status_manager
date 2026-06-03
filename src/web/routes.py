@@ -14,6 +14,11 @@ from src.repositories.auth_repository import (
     get_all_users,
 )
 
+from src.repositories.alert_repository import (
+    get_alert_by_id,
+    update_alert_external_reference,
+)
+
 from flask import (
     render_template,
     request,
@@ -73,6 +78,33 @@ def users():
     return render_template(
         "users.html",
         users=users_list,
+    )
+
+@web_bp.route("/alerts/<int:alert_id>/edit", methods=["GET", "POST"])
+@roles_required("ENGINEER", "ADMINISTRATOR")
+def edit_alert_route(alert_id: int):
+    alert = get_alert_by_id(alert_id)
+
+    if not alert:
+        return redirect("/alert-dashboard")
+
+    if request.method == "POST":
+        external_system = request.form.get("external_system") or None
+        external_ticket = request.form.get("external_ticket") or None
+        external_url = request.form.get("external_url") or None
+
+        update_alert_external_reference(
+            alert_id=alert_id,
+            external_system=external_system,
+            external_ticket=external_ticket,
+            external_url=external_url,
+        )
+
+        return redirect("/alert-dashboard")
+
+    return render_template(
+        "edit_alert.html",
+        alert=alert,
     )
 
 @web_bp.route("/users/<int:user_id>/edit", methods=["GET", "POST"])

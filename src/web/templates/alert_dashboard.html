@@ -133,7 +133,11 @@
     <tbody>
         {% for alert in recently_opened %}
         <tr>
-            <td>{{ alert.alert_number }}</td>
+            <td>
+    <a href="/alerts/{{ alert.id }}/edit">
+        {{ alert.alert_number }}
+    </a>
+</td>
             <td>{{ alert.priority }}</td>
             <td>{{ alert.title }}</td>
             <td>{{ alert.router_name }}</td>

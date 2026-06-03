@@ -117,6 +117,7 @@ def get_recently_opened_alerts(limit: int = 20) -> list[dict[str, Any]]:
         SELECT TOP (?)
             a.alert_number,
             a.status,
+            a.id,
             a.priority,
             a.title,
             a.opened_at,
@@ -143,6 +144,7 @@ def get_recently_opened_alerts(limit: int = 20) -> list[dict[str, Any]]:
             {
                 "alert_number": row.alert_number,
                 "status": row.status,
+                "id": row.id,
                 "priority": row.priority,
                 "title": row.title,
                 "opened_at": row.opened_at,

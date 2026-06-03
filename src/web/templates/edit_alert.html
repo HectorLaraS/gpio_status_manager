@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Alert</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<h1>Edit Alert External Reference</h1>
+
+<p>
+    <a href="/alert-dashboard">Back to Alert Dashboard</a>
+</p>
+
+<div class="rule-card">
+
+    <p class="small-text">Alert: {{ alert.alert_number }}</p>
+    <p class="small-text">Status: {{ alert.status }}</p>
+    <p class="small-text">Priority: {{ alert.priority }}</p>
+    <p class="small-text">Rule: {{ alert.rule_name }}</p>
+    <p class="small-text">Title: {{ alert.title }}</p>
+    <p class="small-text">Router: {{ alert.router_name }}</p>
+    <p class="small-text">Router Description: {{ alert.router_description }}</p>
+
+    <form method="POST">
+
+        <label>External System</label>
+        <input
+            type="text"
+            name="external_system"
+            value="{{ alert.external_system or '' }}"
+            placeholder="ServiceNow, Jira, Remedy..."
+        >
+
+        <br><br>
+
+        <label>External Ticket</label>
+        <input
+            type="text"
+            name="external_ticket"
+            value="{{ alert.external_ticket or '' }}"
+            placeholder="INC1234567"
+        >
+
+        <br><br>
+
+        <label>External URL</label>
+        <input
+            type="text"
+            name="external_url"
+            value="{{ alert.external_url or '' }}"
+            placeholder="https://..."
+        >
+
+        <br><br>
+
+        <button type="submit">Save External Reference</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>
