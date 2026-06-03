@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alert Action Log</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<h1>Alert Action Log Details</h1>
+
+<p>
+    <a href="/alert-action-logs">
+        Back
+    </a>
+</p>
+
+<div class="rule-card">
+
+    <p><strong>Action:</strong> {{ log.action_name }}</p>
+
+    <p><strong>Event:</strong> {{ log.event_type }}</p>
+
+    <p><strong>Status:</strong> {{ log.status }}</p>
+
+    <p><strong>HTTP Code:</strong> {{ log.response_code }}</p>
+
+    <p><strong>Date:</strong> {{ log.created_at }}</p>
+
+    <h3>Request Payload</h3>
+
+    <pre>{{ log.request_payload }}</pre>
+
+    <h3>Response Message</h3>
+
+    <pre>{{ log.response_message }}</pre>
+
+    <h3>Error Message</h3>
+
+    <pre>{{ log.error_message }}</pre>
+
+</div>
+
+</body>
+</html>

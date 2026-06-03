@@ -205,6 +205,88 @@ def set_alert_action_enabled(
         cursor.execute(query, int(is_enabled), action_id)
         conn.commit()
 
+def get_alert_action_log_by_id(
+    log_id: int,
+) -> dict[str, Any] | None:
+    query = """
+        SELECT
+            l.id,
+            l.alert_id,
+            l.alert_action_id,
+            l.event_type,
+            l.status,
+            l.response_code,
+            l.response_message,
+            l.error_message,
+            l.request_payload,
+            l.created_at,
+            a.action_name
+        FROM dbo.alert_action_logs l
+        JOIN dbo.alert_actions a
+            ON l.alert_action_id = a.id
+        WHERE l.id = ?;
+    """
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query, log_id)
+
+        row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return {
+            "id": row.id,
+            "alert_id": row.alert_id,
+            "alert_action_id": row.alert_action_id,
+            "action_name": row.action_name,
+            "event_type": row.event_type,
+            "status": row.status,
+            "response_code": row.response_code,
+            "response_message": row.response_message,
+            "error_message": row.error_message,
+            "request_payload": row.request_payload,
+            "created_at": row.created_at,
+        }
+
+def get_alert_action_logs(
+    limit: int = 500,
+) -> list[dict[str, Any]]:
+    query = f"""
+        SELECT TOP ({limit})
+            l.id,
+            l.alert_id,
+            l.alert_action_id,
+            l.event_type,
+            l.status,
+            l.response_code,
+            l.created_at,
+            a.action_name
+        FROM dbo.alert_action_logs l
+        JOIN dbo.alert_actions a
+            ON l.alert_action_id = a.id
+        ORDER BY l.created_at DESC;
+    """
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+        return [
+            {
+                "id": row.id,
+                "alert_id": row.alert_id,
+                "alert_action_id": row.alert_action_id,
+                "action_name": row.action_name,
+                "event_type": row.event_type,
+                "status": row.status,
+                "response_code": row.response_code,
+                "created_at": row.created_at,
+            }
+            for row in rows
+        ]
 
 def create_alert_action_log(
     alert_id: int | None,

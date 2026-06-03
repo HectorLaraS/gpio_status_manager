@@ -72,6 +72,12 @@
     <p>Configure webhooks for ALERT_OPENED, ALERT_CLOSED and test events.</p>
 </a>
 {% endif %}
+{% if session.role_name == "ADMINISTRATOR" %}
+<a class="home-card" href="/alert-action-logs">
+    <h2>Alert Action Logs</h2>
+    <p>Review webhook executions, responses and failures.</p>
+</a>
+{% endif %}
 
     </div>
   </body>

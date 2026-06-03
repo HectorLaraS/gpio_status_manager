@@ -15,6 +15,11 @@ from src.repositories.auth_repository import (
 )
 
 from src.repositories.alert_action_repository import (
+    get_alert_action_logs,
+    get_alert_action_log_by_id,
+)
+
+from src.repositories.alert_action_repository import (
     create_alert_action,
     get_alert_actions,
     set_alert_action_enabled,
@@ -111,6 +116,29 @@ def edit_alert_route(alert_id: int):
     return render_template(
         "edit_alert.html",
         alert=alert,
+    )
+
+@web_bp.route("/alert-action-logs")
+@roles_required("ADMINISTRATOR")
+def alert_action_logs():
+    logs = get_alert_action_logs()
+
+    return render_template(
+        "alert_action_logs.html",
+        logs=logs,
+    )
+
+@web_bp.route("/alert-action-logs/<int:log_id>")
+@roles_required("ADMINISTRATOR")
+def alert_action_log_details(log_id: int):
+    log = get_alert_action_log_by_id(log_id)
+
+    if not log:
+        return redirect("/alert-action-logs")
+
+    return render_template(
+        "alert_action_log_details.html",
+        log=log,
     )
 
 @web_bp.route("/alert-actions")
