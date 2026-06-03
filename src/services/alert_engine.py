@@ -3,10 +3,13 @@ from datetime import datetime, timedelta
 from src.repositories.alert_repository import (
     close_alert,
     create_alert,
+    get_alert_by_id,
+    get_alert_by_number,
     get_open_alert,
     get_open_alerts,
     update_alert_seen,
 )
+from src.services.webhook_engine import execute_alert_actions
 from src.repositories.db import get_connection
 from src.repositories.incident_rule_repository import get_active_incident_rules
 
@@ -167,6 +170,14 @@ def evaluate_alert_condition(rule: dict, condition: dict) -> None:
         f"rule={rule['rule_key']}"
     )
 
+    alert = get_alert_by_number(alert_number)
+
+    if alert:
+        execute_alert_actions(
+            event_type="ALERT_OPENED",
+            alert=alert,
+        )
+
 
 def build_active_condition_keys(
     conditions: list[dict],
@@ -212,6 +223,15 @@ def close_resolved_alerts(
             continue
 
         close_alert(alert["id"])
+
+        closed_alert = get_alert_by_id(alert["id"])
+
+        if closed_alert:
+            execute_alert_actions(
+                event_type="ALERT_CLOSED",
+                alert=closed_alert,
+            )
+
         closed_count += 1
 
         print(
