@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template
 from src.repositories.dashboard_repository import get_alert_widgets
-
+from src.repositories.poll_execution_dashboard_repository import (
+    get_poll_executions,
+)
 from src.repositories.alert_dashboard_repository import (
     get_alerts_by_type,
     get_open_alerts_summary,
@@ -89,6 +91,16 @@ def users():
     return render_template(
         "users.html",
         users=users_list,
+    )
+
+@web_bp.route("/poll-executions")
+@login_required
+def poll_executions():
+    executions = get_poll_executions()
+
+    return render_template(
+        "poll_executions.html",
+        executions=executions,
     )
 
 @web_bp.route("/alerts/<int:alert_id>/edit", methods=["GET", "POST"])

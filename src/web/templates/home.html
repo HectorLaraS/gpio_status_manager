@@ -52,13 +52,10 @@
       </a>
       {% endif %}
 
-      <a class="home-card disabled-card" href="#">
-        <h2>Poll Executions</h2>
-        <p>
-          Coming soon: review scheduler, inventory, status and alert engine
-          executions.
-        </p>
-      </a>
+      <a class="home-card" href="/poll-executions">
+    <h2>Poll Executions</h2>
+    <p>Review scheduler, inventory, status and alert engine executions.</p>
+</a>
 
       {% if session.role_name == "ADMINISTRATOR" %}
 <a class="home-card" href="/users">

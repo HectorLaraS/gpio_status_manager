@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Poll Executions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<h1>Poll Executions</h1>
+
+<p>
+    <a href="/">Home</a>
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Started</th>
+            <th>Finished</th>
+            <th>Duration</th>
+            <th>Groups</th>
+            <th>Routers</th>
+            <th>Success</th>
+            <th>Failed</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for execution in executions %}
+        <tr>
+            <td>{{ execution.execution_type }}</td>
+            <td>{{ execution.status }}</td>
+            <td>{{ execution.started_at }}</td>
+            <td>{{ execution.finished_at }}</td>
+            <td>{{ execution.duration }}</td>
+            <td>{{ execution.groups_processed }}</td>
+            <td>{{ execution.routers_processed }}</td>
+            <td>{{ execution.routers_success }}</td>
+            <td>{{ execution.routers_failed }}</td>
+            <td>{{ execution.notes }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>
