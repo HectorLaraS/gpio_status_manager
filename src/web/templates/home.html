@@ -66,6 +66,12 @@
     <p>Create users, assign roles and manage access.</p>
 </a>
 {% endif %}
+{% if session.role_name == "ADMINISTRATOR" %}
+<a class="home-card" href="/alert-actions">
+    <h2>Alert Actions</h2>
+    <p>Configure webhooks for ALERT_OPENED, ALERT_CLOSED and test events.</p>
+</a>
+{% endif %}
 
     </div>
   </body>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alert Actions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<h1>Alert Actions</h1>
+
+<p>
+    <a href="/">Home</a> |
+    <a href="/alert-actions/create">Create Alert Action</a>
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Event Type</th>
+            <th>Method</th>
+            <th>Auth</th>
+            <th>Timeout</th>
+            <th>Retries</th>
+            <th>SSL</th>
+            <th>Enabled</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for action in actions %}
+        <tr>
+            <td>{{ action.action_name }}</td>
+            <td>{{ action.event_type }}</td>
+            <td>{{ action.http_method }}</td>
+            <td>{{ action.auth_type }}</td>
+            <td>{{ action.timeout_seconds }}</td>
+            <td>{{ action.retry_count }}</td>
+            <td>{{ action.verify_ssl }}</td>
+            <td>{{ action.is_enabled }}</td>
+            <td>
+                {% if action.is_enabled %}
+                <form method="POST"
+                      action="/alert-actions/{{ action.id }}/disable"
+                      style="display:inline;">
+                    <button type="submit">Disable</button>
+                </form>
+                {% else %}
+                <form method="POST"
+                      action="/alert-actions/{{ action.id }}/enable"
+                      style="display:inline;">
+                    <button type="submit">Enable</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

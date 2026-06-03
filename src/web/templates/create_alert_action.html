@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Alert Action</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<h1>Create Alert Action</h1>
+
+<p>
+    <a href="/alert-actions">Back to Alert Actions</a>
+</p>
+
+<div class="rule-card">
+
+<form method="POST">
+
+    <h2>General</h2>
+
+    <label>Action Name</label>
+    <input type="text" name="action_name" required>
+
+    <br><br>
+
+    <label>Description</label>
+    <input type="text" name="description">
+
+    <br><br>
+
+    <label>Event Type</label>
+    <select name="event_type">
+        <option value="ALERT_OPENED">ALERT_OPENED</option>
+        <option value="ALERT_CLOSED">ALERT_CLOSED</option>
+        <option value="TEST">TEST</option>
+    </select>
+
+    <br><br>
+
+    <h2>Webhook</h2>
+
+    <label>Webhook URL</label>
+    <input type="text" name="webhook_url" required>
+
+    <br><br>
+
+    <label>HTTP Method</label>
+    <select name="http_method">
+        <option value="POST">POST</option>
+        <option value="PUT">PUT</option>
+        <option value="PATCH">PATCH</option>
+    </select>
+
+    <br><br>
+
+    <label>Content Type</label>
+    <input type="text" name="content_type" value="application/json">
+
+    <br><br>
+
+    <h2>Authentication</h2>
+
+    <label>Auth Type</label>
+    <select name="auth_type">
+        <option value="NONE">NONE</option>
+        <option value="API_TOKEN">API_TOKEN</option>
+        <option value="BASIC_AUTH">BASIC_AUTH</option>
+        <option value="CUSTOM_HEADERS">CUSTOM_HEADERS</option>
+    </select>
+
+    <br><br>
+
+    <label>Auth Username</label>
+    <input type="text" name="auth_username">
+
+    <br><br>
+
+    <label>Auth Password</label>
+    <input type="password" name="auth_password">
+
+    <br><br>
+
+    <label>API Token Header</label>
+    <input type="text" name="api_token_header" placeholder="Authorization or X-API-Key">
+
+    <br><br>
+
+    <label>API Token</label>
+    <input type="password" name="api_token">
+
+    <br><br>
+
+    <label>Custom Headers JSON</label>
+    <textarea name="custom_headers_json" rows="5" cols="80"
+              placeholder='{"X-API-Key": "value"}'></textarea>
+
+    <br><br>
+
+    <h2>Payload Template</h2>
+
+    <textarea name="payload_template" rows="16" cols="100">{
+  "event_type": "{{ event_type }}",
+  "alert_number": "{{ alert_number }}",
+  "status": "{{ status }}",
+  "priority": "{{ priority }}",
+  "title": "{{ title }}",
+  "description": "{{ description }}",
+  "router_name": "{{ router_name }}",
+  "router_description": "{{ router_description }}",
+  "rule_name": "{{ rule_name }}",
+  "opened_at": "{{ opened_at }}",
+  "closed_at": "{{ closed_at }}",
+  "occurrence_count": "{{ occurrence_count }}"
+}</textarea>
+
+    <p class="small-text">
+        Available variables:
+        {{ "{{ event_type }}" }},
+        {{ "{{ alert_number }}" }},
+        {{ "{{ status }}" }},
+        {{ "{{ priority }}" }},
+        {{ "{{ title }}" }},
+        {{ "{{ description }}" }},
+        {{ "{{ router_id }}" }},
+        {{ "{{ router_name }}" }},
+        {{ "{{ router_description }}" }},
+        {{ "{{ rule_name }}" }},
+        {{ "{{ opened_at }}" }},
+        {{ "{{ closed_at }}" }},
+        {{ "{{ last_detected_at }}" }},
+        {{ "{{ occurrence_count }}" }}
+    </p>
+
+    <p class="small-text">
+        You may add custom static fields required by the target system.
+        Example: "assignment_group": "Network Operations"
+    </p>
+
+    <h2>Options</h2>
+
+    <label>Timeout Seconds</label>
+    <input type="number" name="timeout_seconds" value="10" min="1">
+
+    <br><br>
+
+    <label>Retry Count</label>
+    <input type="number" name="retry_count" value="0" min="0">
+
+    <br><br>
+
+    <label>
+        <input type="checkbox" name="verify_ssl" checked>
+        Verify SSL
+    </label>
+
+    <br><br>
+
+    <label>
+        <input type="checkbox" name="is_enabled" checked>
+        Enabled
+    </label>
+
+    <br><br>
+
+    <button type="submit">Create Alert Action</button>
+
+</form>
+
+</div>
+
+</body>
+</html>

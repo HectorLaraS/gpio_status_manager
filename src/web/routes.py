@@ -14,6 +14,12 @@ from src.repositories.auth_repository import (
     get_all_users,
 )
 
+from src.repositories.alert_action_repository import (
+    create_alert_action,
+    get_alert_actions,
+    set_alert_action_enabled,
+)
+
 from src.repositories.alert_repository import (
     get_alert_by_id,
     update_alert_external_reference,
@@ -106,6 +112,67 @@ def edit_alert_route(alert_id: int):
         "edit_alert.html",
         alert=alert,
     )
+
+@web_bp.route("/alert-actions")
+@roles_required("ADMINISTRATOR")
+def alert_actions():
+    actions = get_alert_actions()
+
+    return render_template(
+        "alert_actions.html",
+        actions=actions,
+    )
+
+
+@web_bp.route("/alert-actions/create", methods=["GET", "POST"])
+@roles_required("ADMINISTRATOR")
+def create_alert_action_route():
+    if request.method == "POST":
+        create_alert_action(
+            action_name=request.form["action_name"].strip(),
+            description=request.form.get("description") or None,
+            event_type=request.form["event_type"],
+            webhook_url=request.form["webhook_url"].strip(),
+            http_method=request.form["http_method"],
+            auth_type=request.form["auth_type"],
+            auth_username=request.form.get("auth_username") or None,
+            auth_password=request.form.get("auth_password") or None,
+            api_token=request.form.get("api_token") or None,
+            api_token_header=request.form.get("api_token_header") or None,
+            custom_headers_json=request.form.get("custom_headers_json") or None,
+            payload_template=request.form.get("payload_template") or None,
+            content_type=request.form.get("content_type") or "application/json",
+            timeout_seconds=int(request.form.get("timeout_seconds") or 10),
+            retry_count=int(request.form.get("retry_count") or 0),
+            verify_ssl=request.form.get("verify_ssl") == "on",
+            is_enabled=request.form.get("is_enabled") == "on",
+        )
+
+        return redirect("/alert-actions")
+
+    return render_template("create_alert_action.html")
+
+
+@web_bp.route("/alert-actions/<int:action_id>/disable", methods=["POST"])
+@roles_required("ADMINISTRATOR")
+def disable_alert_action_route(action_id: int):
+    set_alert_action_enabled(
+        action_id=action_id,
+        is_enabled=False,
+    )
+
+    return redirect("/alert-actions")
+
+
+@web_bp.route("/alert-actions/<int:action_id>/enable", methods=["POST"])
+@roles_required("ADMINISTRATOR")
+def enable_alert_action_route(action_id: int):
+    set_alert_action_enabled(
+        action_id=action_id,
+        is_enabled=True,
+    )
+
+    return redirect("/alert-actions")
 
 @web_bp.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
 @roles_required("ADMINISTRATOR")
