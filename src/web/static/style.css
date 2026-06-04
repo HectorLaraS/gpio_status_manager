@@ -295,3 +295,23 @@ a:hover {
     text-align: center;
     font-weight: bold;
 }
+
+.status-error {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+.status-warning {
+    color: #ffd166;
+    font-weight: bold;
+}
+
+.status-success {
+    color: #06d6a0;
+    font-weight: bold;
+}
+
+.status-info {
+    color: #4ea8de;
+    font-weight: bold;
+}

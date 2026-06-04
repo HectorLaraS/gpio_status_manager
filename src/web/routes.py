@@ -16,6 +16,12 @@ from src.repositories.auth_repository import (
     get_all_users,
 )
 
+from src.repositories.poll_execution_details_repository import (
+    get_poll_execution_by_execution_id,
+    get_poll_logs_by_execution_id,
+    get_poll_log_summary,
+)
+
 from src.repositories.alert_action_repository import (
     get_alert_action_logs,
     get_alert_action_log_by_id,
@@ -104,6 +110,9 @@ def poll_execution_details(execution_id: str):
     execution = get_poll_execution_by_execution_id(
         execution_id=execution_id,
     )
+    log_summary = get_poll_log_summary(
+    execution_id=execution_id,
+)
 
     if not execution:
         return redirect("/poll-executions")
@@ -116,6 +125,7 @@ def poll_execution_details(execution_id: str):
         "poll_execution_details.html",
         execution=execution,
         logs=logs,
+        log_summary=log_summary,
     )
 
 @web_bp.route("/poll-executions")

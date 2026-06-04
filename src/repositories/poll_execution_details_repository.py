@@ -46,6 +46,35 @@ def get_poll_execution_by_execution_id(
             "notes": row.notes,
         }
 
+def get_poll_log_summary(
+    execution_id: str,
+) -> dict[str, int]:
+    query = """
+        SELECT
+            level_name,
+            COUNT(*) AS total
+        FROM dbo.poll_logs
+        WHERE execution_id = ?
+        GROUP BY level_name;
+    """
+
+    summary = {
+        "INFO": 0,
+        "WARNING": 0,
+        "ERROR": 0,
+        "SUCCESS": 0,
+    }
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query, execution_id)
+
+        rows = cursor.fetchall()
+
+        for row in rows:
+            summary[row.level_name.upper()] = row.total
+
+    return summary
 
 def get_poll_logs_by_execution_id(
     execution_id: str,
