@@ -1,21 +1,17 @@
+
 from typing import Any
 
 from src.clients.netcloud_client import NetCloudClient
 from src.repositories.gpio_repository import upsert_gpio_definition
-from src.utils.gpio_mapper import get_status_key_for_pin
-from src.repositories.gpio_profile_repository import (
-    link_candidate_router,
-    upsert_profile_candidate,
-)
-from src.utils.gpio_signature import (
-    build_gpio_signature,
-    build_suggested_profile_name,
-)
-
 from src.repositories.gpio_profile_repository import (
     get_approved_profile_name_by_signature,
     link_candidate_router,
     upsert_profile_candidate,
+)
+from src.utils.gpio_mapper import get_status_key_for_pin
+from src.utils.gpio_signature import (
+    build_gpio_signature,
+    build_suggested_profile_name,
 )
 
 
@@ -72,6 +68,8 @@ def sync_gpio_definitions_for_router(
 
     pins = extract_gpio_pins_from_configuration(config_manager)
 
+    approved_profile_name = None
+
     if pins:
         signature_hash, pins_json = build_gpio_signature(pins)
         approved_profile_name = get_approved_profile_name_by_signature(signature_hash)
@@ -108,6 +106,7 @@ def sync_gpio_definitions_for_router(
         status_key, auto_profile_name = get_status_key_for_pin(
             product_name=product_name,
             config_pin=str(config_pin),
+            approved_profile_name=approved_profile_name,
         )
 
         profile_name = approved_profile_name or auto_profile_name

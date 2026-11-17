@@ -1,3 +1,4 @@
+
 {
   "IBR900-600M_STANDARD": {
     "product_match": "IBR900-600M",
@@ -5,6 +6,33 @@
       "2": "SATA_GPIO_1",
       "3": "SATA_GPIO_2",
       "4": "SATA_GPIO_3"
+    }
+  },
+  "PTC_CROSSING_STANDARD": {
+    "product_match": "IBR900-600M",
+    "pin_to_status_key": {
+      "2": "SATA_GPIO_1",
+      "3": "SATA_GPIO_2",
+      "4": "SATA_GPIO_3"
+    }
+  },
+  "PTC_CROSSING_PARTIAL": {
+    "product_match": "IBR900-600M",
+    "pin_to_status_key": {
+      "2": "SATA_GPIO_1",
+      "3": "SATA_GPIO_2"
+    }
+  },
+  "PTC_WAYSIDE_LINE_POWER": {
+    "product_match": "IBR900-600M",
+    "pin_to_status_key": {
+      "1": "CONNECTOR_INPUT"
+    }
+  },
+  "PTC_WAYSIDE_SOLAR": {
+    "product_match": "IBR900-600M",
+    "pin_to_status_key": {
+      "1": "CONNECTOR_INPUT"
     }
   }
 }

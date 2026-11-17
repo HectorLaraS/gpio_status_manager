@@ -1,3 +1,4 @@
+
 import json
 from pathlib import Path
 from typing import Any
@@ -29,11 +30,31 @@ def find_profile_for_product(product_name: str | None) -> tuple[str | None, dict
     return None, None
 
 
-def get_status_key_for_pin(product_name: str | None, config_pin: str) -> tuple[str | None, str | None]:
-    profile_name, profile_data = find_profile_for_product(product_name)
+def get_status_key_for_pin(
+    product_name: str | None,
+    config_pin: str,
+    approved_profile_name: str | None = None,
+) -> tuple[str | None, str | None]:
 
-    if not profile_data:
-        return None, None
+    if approved_profile_name:
+        profiles = load_gpio_profiles()
+        profile_data = profiles.get(approved_profile_name)
+
+        if not profile_data:
+            return None, approved_profile_name
+
+        product_match = profile_data.get("product_match")
+
+        if not product_name or not product_match or product_match not in product_name:
+            return None, approved_profile_name
+
+        profile_name = approved_profile_name
+
+    else:
+        profile_name, profile_data = find_profile_for_product(product_name)
+
+        if not profile_data:
+            return None, None
 
     pin_to_status_key = profile_data.get("pin_to_status_key", {})
     status_key = pin_to_status_key.get(str(config_pin))
