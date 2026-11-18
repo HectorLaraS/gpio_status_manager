@@ -9,7 +9,7 @@ import win32serviceutil
 import servicemanager
 
 
-PROJECT_ROOT = r"D:\PythonGeneral\proyectos\gpio_status_manager"
+PROJECT_ROOT = r"E:\tac_python\gpio_status_manager"
 PYTHON_EXE = os.path.join(PROJECT_ROOT, ".venv", "Scripts", "python.exe")
 
 LOG_DIR = os.path.join(PROJECT_ROOT, "logs")
